@@ -15,6 +15,7 @@ public class EnemyController : MonoBehaviour
     public Transform target;                 // Reference to the player (as the target)
     public float rotationLerpSpeed = 0.1f;  // Speed of rotation smoothing
     public GameObject explosionPrefab;
+    public AudioClip explosionClip;
 
 
     // Movement pattern variables
@@ -22,12 +23,13 @@ public class EnemyController : MonoBehaviour
     public float frequency = 1.0f;           // Frequency of the sinusoidal movement
 
 
-    private float nextFireTime = 0.0f;       // Time when the enemy can shoot next
+    private float nextFireTime;      // Time when the enemy can shoot next
     private Vector3 initialPosition;         // Initial position for sinusoidal movement
 
     private void Start()
     {
         initialPosition = transform.position;
+        nextFireTime = fireRate + Random.Range(-fireRateVariance, fireRateVariance);
     }
 
     // Update is called once per frame
@@ -93,6 +95,7 @@ public class EnemyController : MonoBehaviour
         if (lives <= 0)
         {
             Debug.Log($"Enemy {gameObject.name} destroyed!");
+            AudioController.Instance.PlaySound(explosionClip, 0.5f);
             Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
             Destroy(gameObject);
         }

@@ -33,8 +33,6 @@ public class AudioController : MonoBehaviour
         _sfxSource.PlayOneShot(clip, volume);
     }
 
-
-
     public void ChangeMusicVolume(float value)
     {
         _musicSource.volume = value;

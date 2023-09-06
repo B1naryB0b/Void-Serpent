@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -28,6 +29,10 @@ public class PlayerController : MonoBehaviour
 
     public GameObject explosionPrefab;
 
+    private bool isInvulnerable = false;
+    public float invulnerabilityDuration = 2.0f;  // Duration of invulnerability in seconds
+
+    public AudioSource thrustSound;
 
 
     private void Start()
@@ -91,6 +96,8 @@ public class PlayerController : MonoBehaviour
             float originalYScale = thrustTrail.transform.localScale.y;
             float scaleValue = Mathf.Lerp(0, thrustTrailMaxScale, currentThrust / maxThrust);
 
+            thrustSound.volume = (currentThrust / maxThrust) * 0.1f;
+
             // Calculate the difference in scale
             float deltaYScale = scaleValue - originalYScale;
 
@@ -101,6 +108,11 @@ public class PlayerController : MonoBehaviour
 
             // Update the y-scale
             thrustTrail.transform.localScale = new Vector3(thrustTrail.transform.localScale.x, scaleValue, thrustTrail.transform.localScale.z);
+        }
+        else
+        {
+            thrustSound.volume = 0f;
+
         }
     }
 
@@ -118,6 +130,9 @@ public class PlayerController : MonoBehaviour
     // Reduce player's health by the given damage
     public void TakeDamage(int damage)
     {
+        if (isInvulnerable)
+            return;
+
         currentLives -= damage;
         UpdateLifeUI();
         Debug.Log(currentLives);
@@ -128,9 +143,14 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Game Over!");
             Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
             Destroy(gameObject);
-
+        }
+        else
+        {
+            // Start invulnerability coroutine
+            StartCoroutine(InvulnerabilityCoroutine());
         }
     }
+
 
     private void UpdateLifeUI()
     {
@@ -149,6 +169,16 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    private IEnumerator InvulnerabilityCoroutine()
+    {
+        isInvulnerable = true;
+        // Optionally, you can add visual feedback for invulnerability, like blinking the player sprite.
+
+        yield return new WaitForSeconds(invulnerabilityDuration);
+
+        isInvulnerable = false;
+        // Optionally, revert any visual feedback for invulnerability.
+    }
 
 
 }

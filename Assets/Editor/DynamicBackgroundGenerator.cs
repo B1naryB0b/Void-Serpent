@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 [CreateAssetMenu]
 public class DynamicBackgroundGenerator : ScriptableObject
@@ -35,14 +37,42 @@ public class DynamicBackgroundGenerator : ScriptableObject
 
     public void GenerateBackground()
     {
+        Stopwatch stopwatch = new Stopwatch();
+
+        // Measure time for initializing background parents
+        stopwatch.Start();
         backgroundAsteroidsParent = InitializeBackgroundParent(backgroundAsteroidsParent, "Asteroids Background");
         backgroundStarsParent = InitializeBackgroundParent(backgroundStarsParent, "Stars Background");
+        stopwatch.Stop();
+        UnityEngine.Debug.Log($"Initializing background parents took: {stopwatch.ElapsedMilliseconds} ms");
+        stopwatch.Reset();
+
+        // Measure time for clearing spawned positions
+        stopwatch.Start();
         spawnedPositions.Clear();
+        stopwatch.Stop();
+        UnityEngine.Debug.Log($"Clearing spawned positions took: {stopwatch.ElapsedMilliseconds} ms");
+        stopwatch.Reset();
 
+        // Measure time for placing large asteroids
+        stopwatch.Start();
         PlaceLargeAsteroids();
-        PlaceSmallAsteroidsNearLargeOnes();
+        stopwatch.Stop();
+        UnityEngine.Debug.Log($"Placing large asteroids took: {stopwatch.ElapsedMilliseconds} ms");
+        stopwatch.Reset();
 
+        // Measure time for placing small asteroids near large ones
+        stopwatch.Start();
+        PlaceSmallAsteroidsNearLargeOnes();
+        stopwatch.Stop();
+        UnityEngine.Debug.Log($"Placing small asteroids near large ones took: {stopwatch.ElapsedMilliseconds} ms");
+        stopwatch.Reset();
+
+        // Measure time for generating star clusters
+        stopwatch.Start();
         GenerateStarClusters();
+        stopwatch.Stop();
+        UnityEngine.Debug.Log($"Generating star clusters took: {stopwatch.ElapsedMilliseconds} ms");
     }
 
     private GameObject InitializeBackgroundParent(GameObject backgroundParent, string name)
@@ -75,16 +105,19 @@ public class DynamicBackgroundGenerator : ScriptableObject
 
 
     private bool IsPositionValid(Vector3 position, float spacing)
+{
+    float squaredSpacing = spacing * spacing; // Compute squared spacing once
+
+    foreach (Vector3 spawnedPosition in spawnedPositions)
     {
-        foreach (Vector3 spawnedPosition in spawnedPositions)
+        if ((position - spawnedPosition).sqrMagnitude < squaredSpacing)
         {
-            if (Vector3.Distance(position, spawnedPosition) < spacing)
-            {
-                return false;
-            }
+            return false; // Early exit
         }
-        return true;
     }
+    return true;
+}
+
 
     private void PlaceLargeAsteroids()
     {
@@ -198,6 +231,7 @@ public class DynamicBackgroundGenerator : ScriptableObject
 
     public void GenerateStarClusters()
     {
+
         int totalStarClusters = Mathf.FloorToInt(mapSize.x * mapSize.y * STAR_CLUSTER_THRESHOLD);
 
         for (int i = 0; i < totalStarClusters; i++)
@@ -207,29 +241,34 @@ public class DynamicBackgroundGenerator : ScriptableObject
 
             if (noiseValue > STAR_CLUSTER_THRESHOLD && IsPositionValid(randomPosition, starSpacing))
             {
+                
                 PlaceStarsInCluster(randomPosition);
+
             }
         }
+
+
     }
 
     private void PlaceStarsInCluster(Vector3 clusterCenter)
     {
         int starsInCluster = UnityEngine.Random.Range(3, 10); // Define a range for the number of stars in a cluster
+        int starSpritesLength = starSprites.Length; // Cache the length of the starSprites array
 
         for (int i = 0; i < starsInCluster; i++)
         {
-            Vector3 randomOffset = new Vector3(UnityEngine.Random.Range(-starSpacing, starSpacing), UnityEngine.Random.Range(-starSpacing, starSpacing), 0);
-            Vector3 starPosition = clusterCenter + randomOffset;
-
+            float randomXOffset = UnityEngine.Random.Range(-starSpacing, starSpacing);
+            float randomYOffset = UnityEngine.Random.Range(-starSpacing, starSpacing);
+            Vector3 starPosition = new Vector3(clusterCenter.x + randomXOffset, clusterCenter.y + randomYOffset, 0);
 
             if (IsPositionValid(starPosition, starSpacing))
             {
-                Sprite randomStar = starSprites[UnityEngine.Random.Range(0, starSprites.Length)];
-
+                Sprite randomStar = starSprites[UnityEngine.Random.Range(0, starSpritesLength)];
                 float starScale = CalculateStarScale(starPosition);
                 CreateSpriteObject(starPosition, randomStar, Vector2.zero, starScale, backgroundStarsParent.transform);
             }
         }
     }
+
 
 }

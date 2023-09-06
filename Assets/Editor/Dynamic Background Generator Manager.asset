@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c3cfea046ec744d90951b26f70b4a8, type: 3}
+  m_Name: Dynamic Background Generator Manager
+  m_EditorClassIdentifier: 
+  mapSize: {x: 100, y: 100}
+  noiseScale: 0.1
+  noiseOffset: {x: 4, y: 0}
+  LARGE_ASTEROID_THRESHOLD: 0.8
+  SMALL_ASTEROID_MIN_THRESHOLD: 0.7
+  SMALL_ASTEROID_MAX_THRESHOLD: 0.8
+  largeAsteroidSprites:
+  - {fileID: 21300000, guid: d21133e45c5c3e44ba0f5a70ae363e35, type: 3}
+  - {fileID: 21300000, guid: 46f8a68c0939cb54d984166313a949df, type: 3}
+  - {fileID: 21300000, guid: 3b10dd79570eaf54dae84f599140acf7, type: 3}
+  - {fileID: 21300000, guid: 35b2b45d528bb8d4591172519c618afe, type: 3}
+  smallAsteroidSprites:
+  - {fileID: 21300000, guid: 5d1271ddb1826b344ac80223fe311f91, type: 3}
+  - {fileID: 21300000, guid: c7048e038b6d7ad4e9b71ff735768a0e, type: 3}
+  - {fileID: 21300000, guid: 4d505333cfa3b2b4597e3304b87c6a73, type: 3}
+  - {fileID: 21300000, guid: 693e6a1382d49324b96d5540344efe8a, type: 3}
+  spriteColor: {r: 1, g: 1, b: 1, a: 0.039215688}
+  largeAsteroidSpacing: 4
+  smallAsteroidSpacing: 2
+  rotationRange: {x: 0, y: 360}
+  STAR_CLUSTER_THRESHOLD: 0.1
+  starSprites:
+  - {fileID: 21300000, guid: ceee28e886ddf8f499ac9f0f42e3e482, type: 3}
+  - {fileID: 21300000, guid: 206c25d74d948bc42862c71356912b38, type: 3}
+  starSpacing: 2

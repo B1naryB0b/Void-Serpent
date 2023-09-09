@@ -40,7 +40,6 @@ public class BulletController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Hit");
         // If this bullet is a player's bullet, it should only damage enemies
         if (gameObject.layer == LayerMask.NameToLayer("PlayerBullet"))
         {

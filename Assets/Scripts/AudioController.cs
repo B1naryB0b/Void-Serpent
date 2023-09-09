@@ -29,7 +29,6 @@ public class AudioController : MonoBehaviour
             return;
         }
 
-        Debug.Log("Playing sound: " + clip.name);
         _sfxSource.PlayOneShot(clip, volume);
     }
 

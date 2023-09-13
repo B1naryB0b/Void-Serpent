@@ -26,10 +26,13 @@ public class EnemyController : MonoBehaviour
     private float nextFireTime;      // Time when the enemy can shoot next
     private Vector3 initialPosition;         // Initial position for sinusoidal movement
 
+    private Rigidbody2D rb;
+
     private void Start()
     {
         initialPosition = transform.position;
         nextFireTime = fireRate + Random.Range(-fireRateVariance, fireRateVariance);
+        rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
@@ -63,11 +66,14 @@ public class EnemyController : MonoBehaviour
     {
         if (target == null) return;
 
-        // Move forward in the direction the enemy is facing
-        transform.position += transform.up * speed * Time.deltaTime;
+        // Direction forward in the direction the enemy is facing
+        Vector3 forwardDirection = transform.up * speed;
 
         // Apply sinusoidal movement along the Y-axis
-        transform.position = new Vector3(transform.position.x, initialPosition.y + amplitude * Mathf.Sin(Time.time * frequency), transform.position.z);
+        float yVelocity = amplitude * Mathf.Cos(Time.time * frequency) * frequency; // Derivative of the sinusoidal function gives the velocity
+
+        // Set the velocity of the Rigidbody
+        rb.velocity = new Vector3(forwardDirection.x, yVelocity, forwardDirection.z);
     }
 
     private void Shoot()

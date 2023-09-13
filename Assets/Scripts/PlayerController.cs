@@ -16,7 +16,9 @@ public class PlayerController : MonoBehaviour
 
     public GameObject bulletPrefab;          // Prefab for the player's bullet
     public Transform bulletSpawnPoint;       // Point from where the bullet will be spawned
-    public GameObject thrustTrail;           // Reference to the thrust trail GameObject
+
+    public GameObject verticalThrustTrail;
+    public GameObject horizontalThrustTrail;
     public float fireRate = 0.5f;            // Rate at which the player can shoot
     public float thrustTrailMaxScale = 1.0f;  // Maximum scale for the thrust trail
 
@@ -204,8 +206,6 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         canChangeHorizontalDirection = true;
     }
-
-
     #endregion
 
     // Rotate the spaceship to face the direction of the mouse
@@ -231,40 +231,56 @@ public class PlayerController : MonoBehaviour
         rb.velocity = Vector2.ClampMagnitude(rb.velocity, terminalVelocity);
     }
 
-    // Update the y-scale of the thrust trail based on the current thrust
+    // Modify the UpdateThrustTrail function
     private void UpdateThrustTrail()
     {
-        if (thrustTrail)
-        {
-            float originalYScale = thrustTrail.transform.localScale.y;
-            float scaleValue = Mathf.Lerp(0, thrustTrailMaxScale, currentThrust.y / maxThrust);
+        UpdateThrustTrailDirection(currentThrust.y, verticalThrustTrail, Vector3.up);
+        UpdateThrustTrailDirection(currentThrust.x, horizontalThrustTrail, Vector3.right);
+    }
 
-            thrustSound.volume = (currentThrust.y / maxThrust) * 0.1f;
+    private void UpdateThrustTrailDirection(float thrustDirectionValue, GameObject thrustTrailObj, Vector3 direction)
+    {
+        if (thrustTrailObj)
+        {
+            float originalYScale = Mathf.Abs(thrustTrailObj.transform.localScale.y);
+            float scaleValue = Mathf.Lerp(0, thrustTrailMaxScale, Mathf.Abs(thrustDirectionValue) / maxThrust);
+
+            thrustSound.volume = (Mathf.Abs(thrustDirectionValue) / maxThrust) * 0.1f;
 
             // Calculate the difference in scale
             float deltaYScale = scaleValue - originalYScale;
 
             // Adjust the position of the thrust trail based on the change in scale
-            Vector3 newPosition = thrustTrail.transform.localPosition;
-            newPosition.y -= deltaYScale / 2.0f;
-            thrustTrail.transform.localPosition = newPosition;
+            Vector3 newPosition = thrustTrailObj.transform.localPosition;
+            newPosition.y -= deltaYScale / 2.0f * Mathf.Sign(thrustDirectionValue); // use the sign to adjust position based on thrust direction
+            thrustTrailObj.transform.localPosition = newPosition;
 
-            // Update the y-scale
-            thrustTrail.transform.localScale = new Vector3(thrustTrail.transform.localScale.x, scaleValue, thrustTrail.transform.localScale.z);
+            // Update the y-scale and flip the sprite based on the thrust direction
+            thrustTrailObj.transform.localScale = new Vector3(thrustTrailObj.transform.localScale.x, scaleValue * Mathf.Sign(thrustDirectionValue), thrustTrailObj.transform.localScale.z);
 
             if (movementMode == MovementMode.Linear)
             {
-                float angle = Mathf.Atan2(rb.velocity.x, rb.velocity.y) * Mathf.Rad2Deg - 90f;
+                // Set the rotation of thrust trail based on direction
+                float angle;
+                if (direction == Vector3.up)
+                {
+                    angle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg - 90f;
+                }
+                else // if direction is right
+                {
+                    angle = Mathf.Atan2(-direction.y, direction.x) * Mathf.Rad2Deg;
+                }
                 Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
-                thrustTrail.transform.rotation = Quaternion.RotateTowards(thrustTrail.transform.rotation, targetRotation, rotationSpeed);
+                thrustTrailObj.transform.rotation = Quaternion.RotateTowards(thrustTrailObj.transform.rotation, targetRotation, rotationSpeed);
             }
         }
         else
         {
             thrustSound.volume = 0f;
-
         }
     }
+
+
 
 
 

@@ -16,7 +16,7 @@ public class EnemyController : MonoBehaviour
     public float rotationLerpSpeed = 0.1f;  // Speed of rotation smoothing
     public GameObject explosionPrefab;
     public AudioClip explosionClip;
-
+    
 
     // Movement pattern variables
     public float amplitude = 1.0f;           // Amplitude of the sinusoidal movement

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class PlayerController : MonoBehaviour
     public float thrustTrailMaxScale = 1.0f;  // Maximum scale for the thrust trail
 
 
-    private float currentThrust = 0.0f;      // Current thrust value
+    private Vector2 currentThrust = Vector2.zero;      // Current thrust value
+
     private float nextFireTime = 0.0f;       // Time when the player can shoot next
     private Rigidbody2D rb;                  // Player's Rigidbody2D component
 
@@ -38,6 +40,11 @@ public class PlayerController : MonoBehaviour
 
     public AudioSource thrustSound;
 
+    #region Movement Modes
+    private const int INERTIA_CODE = 0;
+    private const int LINEAR_CODE = 1;
+    private const int TANK_CODE = 2;
+
     public enum MovementMode
     {
         Inertia,
@@ -46,6 +53,8 @@ public class PlayerController : MonoBehaviour
     }
 
     private MovementMode movementMode;
+    #endregion
+
 
     private void Start()
     {
@@ -73,31 +82,17 @@ public class PlayerController : MonoBehaviour
     private void UpdateMovement()
     {
         print(movementMode);
-        if (movementMode != MovementMode.Linear)
+        if (movementMode == MovementMode.Inertia)
         {
-            if (Input.GetKey(KeyCode.W))
-            {
-                currentThrust = Mathf.Clamp(currentThrust + thrustIncreaseRate * Time.fixedDeltaTime, 0, maxThrust);
-            }
-            else if (Input.GetKey(KeyCode.S))
-            {
-                currentThrust = Mathf.Clamp(currentThrust - thrustDecreaseRate * Time.fixedDeltaTime, 0, maxThrust);
-            }
-
-            // Apply force in the forward direction based on current thrust
-            rb.AddForce(transform.up * currentThrust);
-
-            ClampVelocity();
+            InertialMovement();
         }
         else if (movementMode == MovementMode.Linear)
         {
-            float horizontalMove = Input.GetAxisRaw("Horizontal");
-            float verticalMove = Input.GetAxisRaw("Vertical");
-
-            // Set the velocity directly based on input and maxThrust
-            rb.velocity = Vector2.Lerp( rb.velocity, new Vector2(horizontalMove, verticalMove).normalized * linearVelocity, Time.deltaTime * thrustIncreaseRate);
-
-            currentThrust = maxThrust * Mathf.Abs(horizontalMove * verticalMove);
+            LinearMovement();
+        }
+        else if (movementMode == MovementMode.Tank)
+        {
+            TankMovement();
         }
         else
         {
@@ -106,11 +101,112 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftControl))
         {
-            rb.velocity = Vector3.Lerp(rb.velocity, rb.velocity * 0.9f, thrustDecreaseRate * Time.fixedDeltaTime);
-            currentThrust = 0f;
+            Brake();
         }
     }
 
+    private void Brake()
+    {
+        rb.velocity = Vector3.Lerp(rb.velocity, rb.velocity * 0.9f, thrustDecreaseRate * Time.fixedDeltaTime);
+        currentThrust = Vector2.zero;
+    }
+
+    #region Movement Systems
+    private void TankMovement()
+    {
+        /*if (Input.GetKey(KeyCode.W))
+        {
+            currentThrust = Mathf.Clamp(currentThrust + thrustIncreaseRate * Time.fixedDeltaTime, 0, maxThrust);
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            currentThrust = Mathf.Clamp(currentThrust - thrustDecreaseRate * Time.fixedDeltaTime, 0, maxThrust);
+        }
+*/
+        // Apply force in the forward direction based on current thrust
+        rb.AddForce(transform.up * currentThrust);
+
+        ClampVelocity();
+    }
+
+    private void LinearMovement()
+    {
+        float horizontalMove = Input.GetAxisRaw("Horizontal");
+        float verticalMove = Input.GetAxisRaw("Vertical");
+
+        // Set the velocity directly based on input and maxThrust
+        rb.velocity = Vector2.Lerp(rb.velocity, new Vector2(horizontalMove, verticalMove).normalized * linearVelocity, Time.deltaTime * thrustIncreaseRate);
+
+        //currentThrust = maxThrust * Mathf.Abs(horizontalMove * verticalMove);
+    }
+
+    private bool canChangeVerticalDirection = true;
+    private bool canChangeHorizontalDirection = true;
+
+    private void InertialMovement()
+    {
+        currentThrust.y = AdjustThrust(currentThrust.y, KeyCode.W, KeyCode.S, canChangeVerticalDirection, VerticalDirectionChangeDelay);
+        currentThrust.x = AdjustThrust(currentThrust.x, KeyCode.D, KeyCode.A, canChangeHorizontalDirection, HorizontalDirectionChangeDelay);
+
+        // Apply force based on thrust values
+        rb.AddForce(transform.up * currentThrust.y + transform.right * currentThrust.x);
+
+        ClampVelocity();
+    }
+
+    private float AdjustThrust(float current, KeyCode positiveKey, KeyCode negativeKey, bool canChangeDirection, Func<IEnumerator> delayMethod)
+    {
+        if (Input.GetKey(positiveKey) && canChangeDirection)
+        {
+            if (current < 0 && !Mathf.Approximately(current, 0f))
+            {
+                current = DecreaseToZero(current, delayMethod);
+            }
+            else
+            {
+                current = Mathf.Clamp(current + thrustIncreaseRate * Time.fixedDeltaTime, 0, maxThrust);
+            }
+        }
+        else if (Input.GetKey(negativeKey) && canChangeDirection)
+        {
+            if (current > 0 && !Mathf.Approximately(current, 0f))
+            {
+                current = DecreaseToZero(current, delayMethod);
+            }
+            else
+            {
+                current = Mathf.Clamp(current - thrustIncreaseRate * Time.fixedDeltaTime, -maxThrust, 0);
+            }
+        }
+        return current;
+    }
+
+    private float DecreaseToZero(float current, Func<IEnumerator> delayMethod)
+    {
+        current = Mathf.MoveTowards(current, 0, thrustDecreaseRate * Time.fixedDeltaTime);
+        if (Mathf.Approximately(current, 0f))
+        {
+            StartCoroutine(delayMethod());
+        }
+        return current;
+    }
+
+    private IEnumerator VerticalDirectionChangeDelay()
+    {
+        canChangeVerticalDirection = false;
+        yield return new WaitForSeconds(0.1f);
+        canChangeVerticalDirection = true;
+    }
+
+    private IEnumerator HorizontalDirectionChangeDelay()
+    {
+        canChangeHorizontalDirection = false;
+        yield return new WaitForSeconds(0.1f);
+        canChangeHorizontalDirection = true;
+    }
+
+
+    #endregion
 
     // Rotate the spaceship to face the direction of the mouse
     private void RotateTowardsMouse()
@@ -141,9 +237,9 @@ public class PlayerController : MonoBehaviour
         if (thrustTrail)
         {
             float originalYScale = thrustTrail.transform.localScale.y;
-            float scaleValue = Mathf.Lerp(0, thrustTrailMaxScale, currentThrust / maxThrust);
+            float scaleValue = Mathf.Lerp(0, thrustTrailMaxScale, currentThrust.y / maxThrust);
 
-            thrustSound.volume = (currentThrust / maxThrust) * 0.1f;
+            thrustSound.volume = (currentThrust.y / maxThrust) * 0.1f;
 
             // Calculate the difference in scale
             float deltaYScale = scaleValue - originalYScale;
@@ -207,21 +303,18 @@ public class PlayerController : MonoBehaviour
 
     public void UpdateMovementMode(int modeCode)
     {
-        if (modeCode == 0)
+        switch (modeCode)
         {
-            movementMode = MovementMode.Inertia;
-        }
-        else if (modeCode == 1)
-        {
-            movementMode = MovementMode.Linear;
-        }
-        else if (modeCode == 2)
-        {
-            movementMode = MovementMode.Tank;
-        }
-        else
-        {
-            movementMode = MovementMode.Inertia;
+            case LINEAR_CODE:
+                movementMode = MovementMode.Linear;
+                break;
+            case TANK_CODE:
+                movementMode = MovementMode.Tank;
+                break;
+            case INERTIA_CODE:
+            default:
+                movementMode = MovementMode.Inertia;
+                break;
         }
 
         print(movementMode);

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -42,6 +43,10 @@ public class PlayerController : MonoBehaviour
 
     public AudioSource[] thrustSounds;
 
+    public Slider verticalThrustSlider;
+    public Slider horizontalThrustSlider;
+
+
     #region Movement Modes
     private const int INERTIA_CODE = 0;
     private const int LINEAR_CODE = 1;
@@ -64,7 +69,7 @@ public class PlayerController : MonoBehaviour
         currentLives = maxLives;
         UpdateLifeUI();
         print("Called start");
-        movementMode = MovementMode.Inertia;
+        movementMode = MovementMode.Linear;
     }
 
     // Update is called once per frame
@@ -78,6 +83,10 @@ public class PlayerController : MonoBehaviour
             Shoot();
             nextFireTime = Time.time + fireRate;
         }
+
+        verticalThrustSlider.value = Mathf.Abs(currentThrust.y / maxThrust);
+        horizontalThrustSlider.value = Mathf.Abs(currentThrust.x / maxThrust);
+
     }
 
     // Handle thrust input and apply force
@@ -137,7 +146,10 @@ public class PlayerController : MonoBehaviour
         float verticalMove = Input.GetAxisRaw("Vertical");
 
         // Set the velocity directly based on input and maxThrust
-        rb.velocity = Vector2.Lerp(rb.velocity, new Vector2(horizontalMove, verticalMove).normalized * linearVelocity, Time.deltaTime * thrustIncreaseRate);
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        {
+            rb.velocity = Vector2.Lerp(rb.velocity, new Vector2(horizontalMove, verticalMove).normalized * linearVelocity, Time.deltaTime * thrustIncreaseRate);
+        }
 
         //currentThrust = maxThrust * Mathf.Abs(horizontalMove * verticalMove);
     }
@@ -196,14 +208,14 @@ public class PlayerController : MonoBehaviour
     private IEnumerator VerticalDirectionChangeDelay()
     {
         canChangeVerticalDirection = false;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.3f);
         canChangeVerticalDirection = true;
     }
 
     private IEnumerator HorizontalDirectionChangeDelay()
     {
         canChangeHorizontalDirection = false;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.3f);
         canChangeHorizontalDirection = true;
     }
     #endregion
@@ -213,17 +225,30 @@ public class PlayerController : MonoBehaviour
     {
         if (movementMode != MovementMode.Tank)
         {
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 direction = mousePosition - transform.position;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f; // Subtracting 90 degrees to align with the up direction
-            Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            // Create a plane with the normal in the negative z-direction, where the player is located.
+            float distanceToPlane;
+            Plane playerPlane = new Plane(-Vector3.forward, transform.position);
+            if (playerPlane.Raycast(ray, out distanceToPlane))
+            {
+                Vector3 pointOnPlane = ray.GetPoint(distanceToPlane);
+                Vector3 direction = pointOnPlane - transform.position;
+
+                direction.z = 0;  // Keep the direction on the player's plane
+
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+                Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            }
         }
         else if (movementMode == MovementMode.Tank)
         {
             transform.Rotate(new Vector3(0, 0, Input.GetAxisRaw("Horizontal") * rotationSpeed));
         }
     }
+
+
 
     // Clamp the player's velocity to the terminal velocity
     private void ClampVelocity()
@@ -238,45 +263,54 @@ public class PlayerController : MonoBehaviour
         UpdateThrustTrailDirection(currentThrust.x, horizontalThrustTrail, Vector3.right, thrustSounds[1]);
     }
 
-    private void UpdateThrustTrailDirection(float thrustDirectionValue, GameObject thrustTrailObj, Vector3 direction, AudioSource source)
+    private void UpdateThrustTrailDirection(float thrustDirectionValue, GameObject thrustTrailObj, Vector3 movementDirection, AudioSource thrustAudioSource)
     {
         if (thrustTrailObj)
         {
-            float originalYScale = Mathf.Abs(thrustTrailObj.transform.localScale.y);
-            float scaleValue = Mathf.Lerp(0, thrustTrailMaxScale, Mathf.Abs(thrustDirectionValue) / maxThrust);
+            float currentYScale = Mathf.Abs(thrustTrailObj.transform.localScale.y);
+            float targetYScale = Mathf.Lerp(0, thrustTrailMaxScale, Mathf.Abs(thrustDirectionValue) / maxThrust);
 
-            source.volume = (Mathf.Abs(thrustDirectionValue) / maxThrust) * 0.1f;
+            thrustAudioSource.volume = (Mathf.Abs(thrustDirectionValue) / maxThrust) * 0.1f;
 
-            // Calculate the difference in scale
-            float deltaYScale = scaleValue - originalYScale;
+            // Calculate the change in scale
+            float scaleChangeY = targetYScale - currentYScale;
 
-            // Adjust the position of the thrust trail based on the change in scale
-            Vector3 newPosition = thrustTrailObj.transform.localPosition;
-            newPosition.y -= deltaYScale / 2.0f * Mathf.Sign(thrustDirectionValue); // use the sign to adjust position based on thrust direction
-            thrustTrailObj.transform.localPosition = newPosition;
+            // Adjust the position of the thrust trail based on the change in scale and direction
+            Vector3 adjustedPosition = thrustTrailObj.transform.localPosition;
 
-            // Update the y-scale and flip the sprite based on the thrust direction
-            thrustTrailObj.transform.localScale = new Vector3(thrustTrailObj.transform.localScale.x, scaleValue * Mathf.Sign(thrustDirectionValue), thrustTrailObj.transform.localScale.z);
+            if (movementDirection == Vector3.up || movementDirection == Vector3.down)
+            {
+                adjustedPosition.y -= scaleChangeY / 2.0f * Mathf.Sign(thrustDirectionValue);
+            }
+            else // if movement direction is horizontal (right or left)
+            {
+                adjustedPosition.x -= scaleChangeY / 2.0f * Mathf.Sign(thrustDirectionValue);
+            }
+
+            thrustTrailObj.transform.localPosition = adjustedPosition;
+
+            // Update the y-scale based on the thrust direction
+            thrustTrailObj.transform.localScale = new Vector3(thrustTrailObj.transform.localScale.x, targetYScale * Mathf.Sign(thrustDirectionValue), thrustTrailObj.transform.localScale.z);
 
             if (movementMode == MovementMode.Linear)
             {
-                // Set the rotation of thrust trail based on direction
-                float angle;
-                if (direction == Vector3.up)
+                // Determine the rotation angle based on movement direction
+                float rotationAngle;
+                if (movementDirection == Vector3.up)
                 {
-                    angle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg - 90f;
+                    rotationAngle = Mathf.Atan2(movementDirection.x, movementDirection.y) * Mathf.Rad2Deg - 90f;
                 }
-                else // if direction is right
+                else // if movement direction is horizontal
                 {
-                    angle = Mathf.Atan2(-direction.y, direction.x) * Mathf.Rad2Deg;
+                    rotationAngle = Mathf.Atan2(-movementDirection.y, movementDirection.x) * Mathf.Rad2Deg;
                 }
-                Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
-                thrustTrailObj.transform.rotation = Quaternion.RotateTowards(thrustTrailObj.transform.rotation, targetRotation, rotationSpeed);
+                Quaternion desiredRotation = Quaternion.Euler(0, 0, rotationAngle);
+                thrustTrailObj.transform.rotation = Quaternion.RotateTowards(thrustTrailObj.transform.rotation, desiredRotation, rotationSpeed);
             }
         }
         else
         {
-            source.volume = 0f;
+            thrustAudioSource.volume = 0f;
         }
     }
 

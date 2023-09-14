@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
     private bool isInvulnerable = false;
     public float invulnerabilityDuration = 2.0f;  // Duration of invulnerability in seconds
 
-    public AudioSource thrustSound;
+    public AudioSource[] thrustSounds;
 
     #region Movement Modes
     private const int INERTIA_CODE = 0;
@@ -234,18 +234,18 @@ public class PlayerController : MonoBehaviour
     // Modify the UpdateThrustTrail function
     private void UpdateThrustTrail()
     {
-        UpdateThrustTrailDirection(currentThrust.y, verticalThrustTrail, Vector3.up);
-        UpdateThrustTrailDirection(currentThrust.x, horizontalThrustTrail, Vector3.right);
+        UpdateThrustTrailDirection(currentThrust.y, verticalThrustTrail, Vector3.up, thrustSounds[0]);
+        UpdateThrustTrailDirection(currentThrust.x, horizontalThrustTrail, Vector3.right, thrustSounds[1]);
     }
 
-    private void UpdateThrustTrailDirection(float thrustDirectionValue, GameObject thrustTrailObj, Vector3 direction)
+    private void UpdateThrustTrailDirection(float thrustDirectionValue, GameObject thrustTrailObj, Vector3 direction, AudioSource source)
     {
         if (thrustTrailObj)
         {
             float originalYScale = Mathf.Abs(thrustTrailObj.transform.localScale.y);
             float scaleValue = Mathf.Lerp(0, thrustTrailMaxScale, Mathf.Abs(thrustDirectionValue) / maxThrust);
 
-            thrustSound.volume = (Mathf.Abs(thrustDirectionValue) / maxThrust) * 0.1f;
+            source.volume = (Mathf.Abs(thrustDirectionValue) / maxThrust) * 0.1f;
 
             // Calculate the difference in scale
             float deltaYScale = scaleValue - originalYScale;
@@ -276,7 +276,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            thrustSound.volume = 0f;
+            source.volume = 0f;
         }
     }
 

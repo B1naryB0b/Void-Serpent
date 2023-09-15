@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
         currentLives = maxLives;
         UpdateLifeUI();
         print("Called start");
-        movementMode = MovementMode.Linear;
+        movementMode = MovementMode.Inertia;
     }
 
     // Update is called once per frame
@@ -330,6 +330,8 @@ public class PlayerController : MonoBehaviour
     // Reduce player's health by the given damage
     public void TakeDamage(int damage)
     {
+        ScreenShaker.Instance.Shake(damage/2f);
+
         if (isInvulnerable)
             return;
 

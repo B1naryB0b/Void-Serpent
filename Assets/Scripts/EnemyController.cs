@@ -31,7 +31,7 @@ public class EnemyController : MonoBehaviour
     private void Start()
     {
         initialPosition = transform.position;
-        nextFireTime = fireRate + Random.Range(-fireRateVariance, fireRateVariance);
+        nextFireTime = (1/fireRate) + Random.Range(-fireRateVariance, fireRateVariance);
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -43,7 +43,7 @@ public class EnemyController : MonoBehaviour
         if (Time.time > nextFireTime)
         {
             Shoot();
-            nextFireTime = Time.time + fireRate + Random.Range(-fireRateVariance, fireRateVariance);
+            nextFireTime = Time.time + (1 / fireRate) + Random.Range(-fireRateVariance, fireRateVariance);
         }
     }
 

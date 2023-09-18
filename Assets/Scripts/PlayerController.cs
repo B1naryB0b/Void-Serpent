@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
         currentLives = maxLives;
         UpdateLifeUI();
         print("Called start");
-        movementMode = MovementMode.Inertia;
+        movementMode = MovementMode.Linear;
     }
 
     // Update is called once per frame

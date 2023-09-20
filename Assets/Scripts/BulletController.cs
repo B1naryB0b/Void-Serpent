@@ -54,7 +54,7 @@ public class BulletController : MonoBehaviour
         // If this bullet is an enemy's bullet, it should only damage the player
         else if (gameObject.layer == LayerMask.NameToLayer("EnemyBullet"))
         {
-            PlayerController player = other.gameObject.GetComponent<PlayerController>();
+            PlayerHP player = other.gameObject.GetComponent<PlayerHP>();
             if (player != null)
             {
                 player.TakeDamage(damage);

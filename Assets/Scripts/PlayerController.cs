@@ -23,23 +23,10 @@ public class PlayerController : MonoBehaviour
     public float fireRate = 0.5f;            // Rate at which the player can shoot
     public float thrustTrailMaxScale = 1.0f;  // Maximum scale for the thrust trail
 
-
     private Vector2 currentThrust = Vector2.zero;      // Current thrust value
 
     private float nextFireTime = 0.0f;       // Time when the player can shoot next
     private Rigidbody2D rb;                  // Player's Rigidbody2D component
-
-    public int maxLives = 3;  // Maximum lives of the player
-    private int currentLives; // Current lives of the player
-    public GameObject lifeIconPrefab; // Prefab for the life icon UI
-    public Transform lifeIconContainer; // UI container for the life icons
-    public float livesUISpacingOffset;
-    public float livesUIHorizontalAdjustmentOffset;
-
-    public GameObject explosionPrefab;
-
-    private bool isInvulnerable = false;
-    public float invulnerabilityDuration = 2.0f;  // Duration of invulnerability in seconds
 
     public AudioSource[] thrustSounds;
 
@@ -66,8 +53,6 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        currentLives = maxLives;
-        UpdateLifeUI();
         print("Called start");
         movementMode = MovementMode.Linear;
     }
@@ -92,7 +77,7 @@ public class PlayerController : MonoBehaviour
     // Handle thrust input and apply force
     private void UpdateMovement()
     {
-        print(movementMode);
+        //print(movementMode);
         if (movementMode == MovementMode.Inertia)
         {
             InertialMovement();
@@ -327,32 +312,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Reduce player's health by the given damage
-    public void TakeDamage(int damage)
-    {
-        ScreenShaker.Instance.Shake(damage/2f);
-
-        if (isInvulnerable)
-            return;
-
-        currentLives -= damage;
-        UpdateLifeUI();
-        Debug.Log(currentLives);
-
-        if (currentLives <= 0)
-        {
-            // Player is out of lives. Handle game over logic here.
-            Debug.Log("Game Over!");
-            Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
-            Destroy(gameObject);
-        }
-        else
-        {
-            // Start invulnerability coroutine
-            StartCoroutine(InvulnerabilityCoroutine());
-        }
-    }
-
     public void UpdateMovementMode(int modeCode)
     {
         switch (modeCode)
@@ -371,35 +330,5 @@ public class PlayerController : MonoBehaviour
 
         print(movementMode);
     }
-
-
-    private void UpdateLifeUI()
-    {
-        // Destroy all existing life icons
-        foreach (Transform child in lifeIconContainer)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // Instantiate life icons based on current lives
-        for (int i = 0; i < currentLives; i++)
-        {
-            GameObject lifeIcon = Instantiate(lifeIconPrefab, lifeIconContainer.transform); // Instantiates and sets the parent in one step
-            lifeIcon.transform.localPosition = new Vector3(i * livesUISpacingOffset - livesUIHorizontalAdjustmentOffset, 0, 0);
-        }
-    }
-
-
-    private IEnumerator InvulnerabilityCoroutine()
-    {
-        isInvulnerable = true;
-        // Optionally, you can add visual feedback for invulnerability, like blinking the player sprite.
-
-        yield return new WaitForSeconds(invulnerabilityDuration);
-
-        isInvulnerable = false;
-        // Optionally, revert any visual feedback for invulnerability.
-    }
-
 
 }

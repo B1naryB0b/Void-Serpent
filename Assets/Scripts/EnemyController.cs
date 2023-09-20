@@ -16,6 +16,8 @@ public class EnemyController : MonoBehaviour
     public float rotationLerpSpeed = 0.1f;  // Speed of rotation smoothing
     public GameObject explosionPrefab;
     public AudioClip explosionClip;
+
+    public GameObject collectablePrefab;
     
 
     // Movement pattern variables
@@ -103,6 +105,7 @@ public class EnemyController : MonoBehaviour
             Debug.Log($"Enemy {gameObject.name} destroyed!");
             AudioController.Instance.PlaySound(explosionClip, 0.5f);
             Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
+            Instantiate(collectablePrefab, gameObject.transform.position, Quaternion.identity );
             Destroy(gameObject);
         }
         else

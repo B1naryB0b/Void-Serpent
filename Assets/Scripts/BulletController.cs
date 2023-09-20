@@ -7,7 +7,6 @@ public class BulletController : MonoBehaviour
     public int damage = 1;            // Damage dealt by the bullet
     public float lifeTime = 5.0f;     // Time after which the bullet will be destroyed
 
-    public AudioClip fireSound;         // Sound effect when bullet is fired
     public AudioClip hitEnemySound;     // Sound effect when bullet hits an enemy
     public AudioClip hitPlayerSound;    // Sound effect when bullet hits the player
 
@@ -16,19 +15,6 @@ public class BulletController : MonoBehaviour
         // Destroy the bullet after a certain time to prevent memory leaks
         Destroy(gameObject, lifeTime);
     }
-
-    private void Awake()
-    {
-        float volume = 1.0f;
-        if (gameObject.layer == LayerMask.NameToLayer("EnemyBullet"))
-        {
-            volume = 0.1f;
-        }
-
-        AudioController.Instance.PlaySound(fireSound, volume);
-    }
-
-
 
 
     // Update is called once per frame

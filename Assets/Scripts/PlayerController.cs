@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
 
     public GameObject bulletPrefab;          // Prefab for the player's bullet
-    public Transform bulletSpawnPoint;       // Point from where the bullet will be spawned
+    public List<Transform> bulletSpawnPoints;       // Point from where the bullet will be spawned
 
     public GameObject verticalThrustTrail;
     public GameObject horizontalThrustTrail;
@@ -32,6 +33,10 @@ public class PlayerController : MonoBehaviour
 
     public Slider verticalThrustSlider;
     public Slider horizontalThrustSlider;
+
+    public RampingController rampingController;
+
+    public AudioClip fireSound;         // Sound effect when bullet is fired
 
 
     #region Movement Modes
@@ -299,18 +304,42 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-
-
-
-    // Shoot bullets in the forward direction
     private void Shoot()
     {
-        if (bulletPrefab && bulletSpawnPoint)
+        if (bulletPrefab && transform)
         {
-            Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+            float volume = 1f;
+            AudioController.Instance.PlaySound(fireSound, volume);
+
+            switch (rampingController.rampingTier)
+            {
+                case 3:
+                    Instantiate(bulletPrefab, bulletSpawnPoints[0].position, bulletSpawnPoints[0].rotation);
+                    Instantiate(bulletPrefab, bulletSpawnPoints[1].position, bulletSpawnPoints[1].rotation * Quaternion.Euler(0, 0, 10));
+                    Instantiate(bulletPrefab, bulletSpawnPoints[2].position, bulletSpawnPoints[2].rotation * Quaternion.Euler(0, 0, -10));
+                    Instantiate(bulletPrefab, bulletSpawnPoints[3].position, bulletSpawnPoints[3].rotation * Quaternion.Euler(0, 0, 20));
+                    Instantiate(bulletPrefab, bulletSpawnPoints[4].position, bulletSpawnPoints[4].rotation * Quaternion.Euler(0, 0, -20));
+                    break;
+
+                case 2:
+                    Instantiate(bulletPrefab, bulletSpawnPoints[0].position, bulletSpawnPoints[0].rotation);
+                    Instantiate(bulletPrefab, bulletSpawnPoints[1].position, bulletSpawnPoints[1].rotation * Quaternion.Euler(0, 0, 10));
+                    Instantiate(bulletPrefab, bulletSpawnPoints[2].position, bulletSpawnPoints[2].rotation * Quaternion.Euler(0, 0, -10));
+                    break;
+
+                case 1:
+                    Instantiate(bulletPrefab, bulletSpawnPoints[3].position, bulletSpawnPoints[3].rotation);
+                    Instantiate(bulletPrefab, bulletSpawnPoints[4].position, bulletSpawnPoints[4].rotation);
+                    break;
+
+                case 0:
+                default:
+                    Instantiate(bulletPrefab, bulletSpawnPoints[0].position, bulletSpawnPoints[0].rotation);
+                    break;
+            }
         }
     }
+
 
     public void UpdateMovementMode(int modeCode)
     {

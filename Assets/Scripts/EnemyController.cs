@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 public class EnemyController : MonoBehaviour
 {
@@ -18,7 +19,8 @@ public class EnemyController : MonoBehaviour
     public AudioClip explosionClip;
 
     public GameObject collectablePrefab;
-    
+
+    public AudioClip fireSound;         // Sound effect when bullet is fired
 
     // Movement pattern variables
     public float amplitude = 1.0f;           // Amplitude of the sinusoidal movement
@@ -29,6 +31,8 @@ public class EnemyController : MonoBehaviour
     private Vector3 initialPosition;         // Initial position for sinusoidal movement
 
     private Rigidbody2D rb;
+
+    public RampingController rampingController;
 
     private void Start()
     {
@@ -86,6 +90,10 @@ public class EnemyController : MonoBehaviour
             float errorOffset = Random.Range(-aimError, aimError);
             Quaternion bulletAngle = Quaternion.Euler(bulletSpawnPoint.eulerAngles.x, bulletSpawnPoint.eulerAngles.y, bulletSpawnPoint.eulerAngles.z + errorOffset);
             Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletAngle);
+
+            float volume = 0.1f;
+            AudioController.Instance.PlaySound(fireSound, volume);
+
         }
     }
 
@@ -95,6 +103,8 @@ public class EnemyController : MonoBehaviour
     public void TakeDamage(int damage)
     {
         lives -= damage;
+
+        rampingController.IncreaseRamping(damage);
 
         // Update the visual representation of lives (if any)
         UpdateLivesDisplay();

@@ -11,6 +11,10 @@ public class Collector : MonoBehaviour
 
     public AudioClip collectClip;
 
+    public RampingController rampingController;
+
+    public float rampingPerCollectable;
+
     // Update is called once per frame
     void Update()
     {
@@ -47,6 +51,8 @@ public class Collector : MonoBehaviour
         if (collectableLayer == (collectableLayer | (1 << collision.gameObject.layer)))
         {
             AudioController.Instance.PlaySound(collectClip, 0.3f);
+
+            rampingController.IncreaseRamping(rampingPerCollectable);
             // Hide the sprite of the collectable
             SpriteRenderer spriteRenderer = collision.gameObject.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)

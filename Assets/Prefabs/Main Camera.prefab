@@ -159,7 +159,7 @@ MonoBehaviour:
   secondaryFocusPoints: []
   pointsOfInterest:
   - poiTransform: {fileID: 0}
-    importance: 0.3
+    importance: 0.4
   smoothSpeed: 5
   offset: {x: 0, y: 0, z: -10}
   focusWeight: 0.3

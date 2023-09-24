@@ -22,6 +22,7 @@ public class RampingController : MonoBehaviour
     void Start()
     {
         ramping = 0f;   
+        rampingSlider.maxValue = rampingTierSize;
     }
 
     // Update is called once per frame
@@ -56,7 +57,6 @@ public class RampingController : MonoBehaviour
 
     private void DecayRamping()
     {
-        print(ramping - (rampingDecay * rampingTier * Time.deltaTime));
         if (ramping - (rampingDecay * rampingTier * Time.deltaTime) < minRamping)
         {
             ramping = minRamping;

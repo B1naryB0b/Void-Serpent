@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c3cfea046ec744d90951b26f70b4a8, type: 3}
   m_Name: Dynamic Background Generator Manager
   m_EditorClassIdentifier: 
-  mapSize: {x: 500, y: 500}
+  mapSize: {x: 100, y: 60}
   noiseScale: 0.1
   noiseOffset: {x: 4, y: 0}
   LARGE_ASTEROID_THRESHOLD: 0.8

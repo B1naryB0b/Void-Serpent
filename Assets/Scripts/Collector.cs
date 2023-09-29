@@ -50,7 +50,7 @@ public class Collector : MonoBehaviour
         // Check if the colliding object is in the collectable layer
         if (collectableLayer == (collectableLayer | (1 << collision.gameObject.layer)))
         {
-            AudioController.Instance.PlaySound(collectClip, 0.3f);
+            AudioController.Instance.PlaySound(collectClip, 0.2f);
 
             rampingController.IncreaseRamping(rampingPerCollectable);
             // Hide the sprite of the collectable

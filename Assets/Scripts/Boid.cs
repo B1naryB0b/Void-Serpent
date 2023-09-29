@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class Boid : MonoBehaviour
 {
     [Header("Boid Parameters")]
@@ -38,6 +42,13 @@ public class Boid : MonoBehaviour
 
         boidDirection = transform.up;
         transform.up = boidRb.velocity.normalized;
+
+        if (localBoidList.Count > 20)
+        {
+            #if UNITY_EDITOR
+            EditorApplication.isPlaying = false;
+            #endif
+        }
 
         foreach (Transform boid in localBoidList)
         {

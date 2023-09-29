@@ -98,10 +98,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df29e0ddcfd8a054894a787b5cd6be72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 15
+  speed: 30
   damage: 1
   lifeTime: 10
-  fireSound: {fileID: 8300000, guid: 8f0314c770430a541a6faa2633c408b0, type: 3}
   hitEnemySound: {fileID: 8300000, guid: aca9776cea8dcd546a0d07b9e085de76, type: 3}
   hitPlayerSound: {fileID: 8300000, guid: 4a68141ec95e9684baff456529592605, type: 3}
 --- !u!61 &-3390615449559890330

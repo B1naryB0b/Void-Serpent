@@ -1,11 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class POI
+public class POI : IPointOfInterest
 {
-    public Transform poiTransform;
+    [SerializeField] public Transform poiTransform;
+    public Transform PointTransform => poiTransform; // Implementation of IPointOfInterest
 
-    [Range(0f, 1f)] public float importance = 0.2f; //value between 0f and 1f that specifies the importance of the point of interest weighting
+    [SerializeField]
+    [Range(0f, 1f)]
+    public float importance = 0.2f; // Implementation of IPointOfInterest
+    public float Importance
+    {
+        get => importance;
+        set
+        {
+            if (value >= 0f && value <= 1f)
+                importance = value;
+        }
+    }
 }
+

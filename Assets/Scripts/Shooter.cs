@@ -28,35 +28,45 @@ public class Shooter : MonoBehaviour
     {
         if (bulletPrefab && transform)
         {
-            float volume = 1f;
-            AudioController.Instance.PlaySound(fireSound, volume);
+            AudioController.Instance.PlaySound(fireSound, 1f);
 
             switch (rampingController.rampingTier)
             {
                 case 3:
-                    Instantiate(bulletPrefab, bulletSpawnPoints[0].position, bulletSpawnPoints[0].rotation);
-                    Instantiate(bulletPrefab, bulletSpawnPoints[1].position, bulletSpawnPoints[1].rotation * Quaternion.Euler(0, 0, 10));
-                    Instantiate(bulletPrefab, bulletSpawnPoints[2].position, bulletSpawnPoints[2].rotation * Quaternion.Euler(0, 0, -10));
-                    Instantiate(bulletPrefab, bulletSpawnPoints[3].position, bulletSpawnPoints[3].rotation * Quaternion.Euler(0, 0, 20));
-                    Instantiate(bulletPrefab, bulletSpawnPoints[4].position, bulletSpawnPoints[4].rotation * Quaternion.Euler(0, 0, -20));
+                    FireBullet(0);
+                    FireBullet(1, 10);
+                    FireBullet(2, -10);
+                    FireBullet(3, 20);
+                    FireBullet(4, -20);
                     break;
 
                 case 2:
-                    Instantiate(bulletPrefab, bulletSpawnPoints[0].position, bulletSpawnPoints[0].rotation);
-                    Instantiate(bulletPrefab, bulletSpawnPoints[1].position, bulletSpawnPoints[1].rotation * Quaternion.Euler(0, 0, 10));
-                    Instantiate(bulletPrefab, bulletSpawnPoints[2].position, bulletSpawnPoints[2].rotation * Quaternion.Euler(0, 0, -10));
+                    FireBullet(0);
+                    FireBullet(1, 10);
+                    FireBullet(2, -10);
                     break;
 
                 case 1:
-                    Instantiate(bulletPrefab, bulletSpawnPoints[3].position, bulletSpawnPoints[3].rotation);
-                    Instantiate(bulletPrefab, bulletSpawnPoints[4].position, bulletSpawnPoints[4].rotation);
+                    FireBullet(3);
+                    FireBullet(4);
                     break;
 
                 case 0:
                 default:
-                    Instantiate(bulletPrefab, bulletSpawnPoints[0].position, bulletSpawnPoints[0].rotation);
+                    FireBullet(0);
                     break;
             }
         }
     }
+
+    private void FireBullet(int index, float rotationOffset = 0)
+    {
+        Quaternion rotation = bulletSpawnPoints[index].rotation;
+        if (rotationOffset != 0)
+        {
+            rotation *= Quaternion.Euler(0, 0, rotationOffset);
+        }
+        Instantiate(bulletPrefab, bulletSpawnPoints[index].position, rotation);
+    }
+
 }

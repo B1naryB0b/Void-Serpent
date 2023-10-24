@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
       // Rate at which thrust decreases when pressing S
     [SerializeField] private float rotationSpeed = 200.0f;     // Speed of rotation towards the mouse
     [SerializeField] private float brakeStrength = 10.0f;
+    [SerializeField] private float brakeStoppingVelocity = 0.5f;
+
 
     private Vector2 currentThrust = Vector2.zero;
 
@@ -87,6 +89,10 @@ public class PlayerController : MonoBehaviour
     private void Brake(Rigidbody2D rb)
     {
         rb.velocity = Vector3.Lerp(rb.velocity, rb.velocity * 0.9f, brakeStrength * Time.fixedDeltaTime);
+        if (rb.velocity.sqrMagnitude < brakeStoppingVelocity)
+        {
+            rb.velocity = Vector2.zero;
+        }
         currentThrust = Vector2.zero;
     }
 

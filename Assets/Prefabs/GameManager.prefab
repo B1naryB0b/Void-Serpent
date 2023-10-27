@@ -176,10 +176,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ramping: 40
-  rampingDecay: 2
-  maxRamping: 80
+  maxRamping: 120
   minRamping: 0
-  rampingTierSize: 20
+  rampingDecays:
+  - 0.5
+  - 4
+  - 8
+  - 16
+  rampingTierSizes:
+  - 5
+  - 25
+  - 50
+  - 80
   rampingSlider: {fileID: 0}
   rampingText: {fileID: 0}
   rampingTier: 0

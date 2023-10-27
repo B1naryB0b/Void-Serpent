@@ -19,8 +19,8 @@ TagManager:
   - PlayerBullet
   - EnemyBullet
   - Collectable
-  - 
-  - 
+  - Obstacle
+  - Wall
   - 
   - 
   - 

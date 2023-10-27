@@ -28,7 +28,7 @@ public class Shooter : MonoBehaviour
     {
         if (bulletPrefab && transform)
         {
-            AudioController.Instance.PlaySound(fireSound, 1f);
+            AudioController.Instance.PlaySound(fireSound, 0.5f);
 
             switch (rampingController.rampingTier)
             {

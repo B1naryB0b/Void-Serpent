@@ -26,6 +26,11 @@ public class BulletController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+        {
+            Destroy(gameObject);
+        }
+
         // If this bullet is a player's bullet, it should only damage enemies
         if (gameObject.layer == LayerMask.NameToLayer("PlayerBullet"))
         {
@@ -48,7 +53,10 @@ public class BulletController : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+
     }
+
+    
 
 
 }

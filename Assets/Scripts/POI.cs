@@ -8,7 +8,7 @@ public class POI : IPointOfInterest
 
     [SerializeField]
     [Range(0f, 1f)]
-    public float importance = 0.2f; // Implementation of IPointOfInterest
+    public float importance = 0.1f; // Implementation of IPointOfInterest
     public float Importance
     {
         get => importance;

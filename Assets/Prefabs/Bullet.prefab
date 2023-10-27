@@ -101,7 +101,6 @@ MonoBehaviour:
   speed: 30
   damage: 1
   lifeTime: 10
-  fireSound: {fileID: 8300000, guid: 8f0314c770430a541a6faa2633c408b0, type: 3}
   hitEnemySound: {fileID: 8300000, guid: aca9776cea8dcd546a0d07b9e085de76, type: 3}
   hitPlayerSound: {fileID: 8300000, guid: 4a68141ec95e9684baff456529592605, type: 3}
 --- !u!61 &-4029280790058772975
@@ -133,7 +132,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

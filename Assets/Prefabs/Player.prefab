@@ -5338,7 +5338,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 720
-  brakeStrength: 10
+  brakeStrength: 60
+  brakeStoppingVelocity: 0.5
 --- !u!114 &369441711824145749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5370,15 +5371,15 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4746351170598233541}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 0.1
-  m_LinearDrag: 1
-  m_AngularDrag: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0
   m_GravityScale: 0
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 931a6b7f8d586164eaa0034d27ef7613, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -5387,7 +5388,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 2
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!60 &1993403399
 PolygonCollider2D:
@@ -5518,7 +5519,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxLinearVelocity: 20
-  acceleration: 10
+  accelerationCurveMultiplier: 20
+  accelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0
+      value: 0.99998903
+      inSlope: -0.0678717
+      outSlope: -0.0678717
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.20833352
+    - serializedVersion: 3
+      time: 1
+      value: 0.0000133141875
+      inSlope: -3.4293427
+      outSlope: -3.4293427
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.07747178
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &731821137972013182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5583,7 +5608,7 @@ MonoBehaviour:
   destroyDelay: 0.2
   collectClip: {fileID: 8300000, guid: 3a0ef328b3e26744f87eb5b78efda18a, type: 3}
   rampingController: {fileID: 0}
-  rampingPerCollectable: 2
+  rampingPerCollectable: 3
 --- !u!1 &5558559604997340762
 GameObject:
   m_ObjectHideFlags: 0

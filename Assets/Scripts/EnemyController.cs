@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 public class EnemyController : MonoBehaviour
@@ -6,15 +8,15 @@ public class EnemyController : MonoBehaviour
     // Member Variables
     public int lives = 3; // Number of lives the enemy has
 
-    public float speed = 3.0f;               // Speed of the enemy spaceship
     public float fireRate = 1.0f;            // Rate at which the enemy can shoot\
     public float fireRateVariance = 0.1f;
-    public float aimError = 5.0f;  // Maximum degrees of aiming error
+    public float fireRange;
+    public float aimError;
 
     public GameObject bulletPrefab;          // Prefab for the enemy's bullet
     public Transform bulletSpawnPoint;       // Point from where the bullet will be spawned
-    public Transform target;                 // Reference to the player (as the target)
-    public float rotationLerpSpeed = 0.1f;  // Speed of rotation smoothing
+    private Transform target;                 // Reference to the player (as the target)
+
     public GameObject explosionPrefab;
     public AudioClip explosionClip;
 
@@ -22,65 +24,61 @@ public class EnemyController : MonoBehaviour
 
     public AudioClip fireSound;         // Sound effect when bullet is fired
 
-    // Movement pattern variables
-    public float amplitude = 1.0f;           // Amplitude of the sinusoidal movement
-    public float frequency = 1.0f;           // Frequency of the sinusoidal movement
-
-
     private float nextFireTime;      // Time when the enemy can shoot next
-    private Vector3 initialPosition;         // Initial position for sinusoidal movement
 
-    private Rigidbody2D rb;
 
-    public RampingController rampingController;
+    private RampingController rampingController;
+
+    private bool playerInCrosshair;
 
     private void Start()
     {
-        initialPosition = transform.position;
-        nextFireTime = (1/fireRate) + Random.Range(-fireRateVariance, fireRateVariance);
-        rb = GetComponent<Rigidbody2D>();
-    }
+        target = FindObjectOfType<PlayerController>().transform;
+        rampingController = FindObjectOfType<RampingController>().GetComponent<RampingController>();
 
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        RotateTowardsTarget();
-        Move();
-        if (Time.time > nextFireTime)
-        {
-            Shoot();
-            nextFireTime = Time.time + (1 / fireRate) + Random.Range(-fireRateVariance, fireRateVariance);
-        }
+        print(target.name);
+        print(rampingController.name);
+
+        nextFireTime = (1/fireRate) + Random.Range(-fireRateVariance, fireRateVariance);
+
+        StartCoroutine(ShootingRoutine());
+
     }
 
     // Rotate towards the player with a degree of error and smooth rotation
-    private void RotateTowardsTarget()
+    private bool CrosshairCheck()
     {
-        if (target == null) return;
+        if (target == null) return false;
 
-        Vector3 direction = target.position - transform.position;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f; // Subtracting 90 degrees to align with the up direction
+        // Correcting the layer mask usage. This line was potentially causing the issue.
+        int layerMask = 1 << LayerMask.NameToLayer("Player"); // it's crucial to shift bits for the mask, not direct use.
 
-        Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.fixedDeltaTime);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, fireRange, layerMask);
+        return hit.collider != null; // ensure we hit something.
     }
 
-
-
-    // Complex AI movement, possibly random or following a pattern
-    private void Move()
+    private IEnumerator ShootingRoutine()
     {
-        if (target == null) return;
+        // Initial wait before the loop starts.
+        yield return new WaitForSeconds(nextFireTime);
 
-        // Direction forward in the direction the enemy is facing
-        Vector3 forwardDirection = transform.up * speed;
+        while (true) // creates an endless loop until the enemy is destroyed or the game ends.
+        {
+            playerInCrosshair = CrosshairCheck();
 
-        // Apply sinusoidal movement along the Y-axis
-        float yVelocity = amplitude * Mathf.Cos(Time.time * frequency) * frequency; // Derivative of the sinusoidal function gives the velocity
+            // If the player is in crosshair, shoot.
+            if (playerInCrosshair)
+            {
+                Shoot();
+                // Calculate the next fire time with variance.
+                nextFireTime = (1 / fireRate) + Random.Range(-fireRateVariance, fireRateVariance);
+            }
 
-        // Set the velocity of the Rigidbody
-        rb.velocity = new Vector3(forwardDirection.x, yVelocity, forwardDirection.z);
+            // Wait for the calculated time until the next shot.
+            yield return new WaitForSeconds(nextFireTime);
+        }
     }
+
 
     private void Shoot()
     {
@@ -104,7 +102,7 @@ public class EnemyController : MonoBehaviour
     {
         lives -= damage;
 
-        rampingController.IncreaseRamping(damage);
+        //rampingController.IncreaseRamping(damage);
 
         // Update the visual representation of lives (if any)
         UpdateLivesDisplay();
@@ -113,7 +111,7 @@ public class EnemyController : MonoBehaviour
         if (lives <= 0)
         {
             Debug.Log($"Enemy {gameObject.name} destroyed!");
-            AudioController.Instance.PlaySound(explosionClip, 0.5f);
+            AudioController.Instance.PlaySound(explosionClip, 0.15f);
             Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
             Instantiate(collectablePrefab, gameObject.transform.position, Quaternion.identity );
             Destroy(gameObject);

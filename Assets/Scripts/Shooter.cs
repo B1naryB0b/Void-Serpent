@@ -4,69 +4,69 @@ using UnityEngine;
 
 public class Shooter : MonoBehaviour
 {
-    [SerializeField] private GameObject bulletPrefab;          // Prefab for the player's bullet
-    [SerializeField] private List<Transform> bulletSpawnPoints;       // Point from where the bullet will be spawned
+    [SerializeField] private GameObject _bulletPrefab;   
+    [SerializeField] private List<Transform> _bulletSpawnPoints;
 
-    [SerializeField] private float fireRate = 0.5f;            // Rate at which the player can shoot
+    [SerializeField] private float _playerShootRate;
 
-    [SerializeField] private AudioClip fireSound;         // Sound effect when bullet is fired
+    [SerializeField] private AudioClip _shootSound;
 
-    [SerializeField] private RampingController rampingController;
+    [SerializeField] private RampingController _rampingController;
 
-    private float nextFireTime = 0.0f;
+    private float _nextShootTime = 0.0f;
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Mouse0) && Time.time > nextFireTime)
+        if (Input.GetKey(KeyCode.Mouse0) && Time.time > _nextShootTime)
         {
             Shoot();
-            nextFireTime = Time.time + fireRate;
+            _nextShootTime = Time.time + (1f/_playerShootRate);
         }
     }
 
     public void Shoot()
     {
-        if (bulletPrefab && transform)
+        if (_bulletPrefab && transform)
         {
-            AudioController.Instance.PlaySound(fireSound, 0.5f);
+            AudioController.Instance.PlaySound(_shootSound, 0.5f);
 
-            switch (rampingController.rampingTier)
+            switch (_rampingController.CurrentRampingTier)
             {
                 case 3:
-                    FireBullet(0);
-                    FireBullet(1, 10);
-                    FireBullet(2, -10);
-                    FireBullet(3, 20);
-                    FireBullet(4, -20);
+                    SpawnBullet(0);
+                    SpawnBullet(1, 10);
+                    SpawnBullet(2, -10);
+                    SpawnBullet(3, 20);
+                    SpawnBullet(4, -20);
                     break;
 
                 case 2:
-                    FireBullet(0);
-                    FireBullet(1, 10);
-                    FireBullet(2, -10);
+                    SpawnBullet(0);
+                    SpawnBullet(1, 10);
+                    SpawnBullet(2, -10);
                     break;
 
                 case 1:
-                    FireBullet(3);
-                    FireBullet(4);
+                    SpawnBullet(3);
+                    SpawnBullet(4);
                     break;
 
                 case 0:
                 default:
-                    FireBullet(0);
+                    SpawnBullet(0);
                     break;
             }
         }
     }
 
-    private void FireBullet(int index, float rotationOffset = 0)
+    private void SpawnBullet(int index, float rotationOffset = 0)
     {
-        Quaternion rotation = bulletSpawnPoints[index].rotation;
+        Quaternion rotation = _bulletSpawnPoints[index].rotation;
         if (rotationOffset != 0)
         {
             rotation *= Quaternion.Euler(0, 0, rotationOffset);
         }
-        Instantiate(bulletPrefab, bulletSpawnPoints[index].position, rotation);
+        Instantiate(_bulletPrefab, _bulletSpawnPoints[index].position, rotation);
     }
 
 }

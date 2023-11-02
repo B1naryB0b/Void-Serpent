@@ -4,56 +4,54 @@ using UnityEngine;
 
 public class Collector : MonoBehaviour
 {
-    public float attractionSpeed = 10f; // Base attraction speed
-    public float maxAttractionDistance = 5f; // Maximum distance at which the attraction is applied
-    public LayerMask collectableLayer; // Layer of the collectable items
-    public float destroyDelay = 1f; // Delay before destroying the collectable
+    [SerializeField] private float _collectableAttractionSpeed; 
+    [SerializeField] private float _maxAttractionDistance; 
+    [SerializeField] private LayerMask _collectableLayer; 
+    [SerializeField] private float _destroyCollectableDelay; 
 
-    public AudioClip collectClip;
+    [SerializeField] private AudioClip _collectAudioClip;
 
-    public RampingController rampingController;
+    [SerializeField] private RampingController _rampingController;
 
-    public float rampingPerCollectable;
+    [SerializeField] private float _rampingPerCollectable;
 
-    // Update is called once per frame
     void Update()
     {
-        /*if (!Input.GetButton("Fire1"))
-        {
-        }*/
-            AttractCollectables();
+        Collider2D[] collectables = CheckForCollectables();
+        AttractCollectables(collectables);
     }
 
-    void AttractCollectables()
+    private Collider2D[] CheckForCollectables()
     {
-        // Find all collectables within the max attraction distance
-        Collider2D[] collectables = Physics2D.OverlapCircleAll(transform.position, maxAttractionDistance, collectableLayer);
+        Collider2D[] collectables = Physics2D.OverlapCircleAll(transform.position, _maxAttractionDistance, _collectableLayer);
+        if (collectables.Length <= 0) return null;
+        return collectables;
+    }
+
+    private void AttractCollectables(Collider2D[] collectables)
+    {
+        if (collectables == null) return;
 
         foreach (Collider2D collectable in collectables)
         {
-            // Calculate the direction from the collectable to the player
             Vector2 directionToPlayer = (transform.position - collectable.transform.position).normalized;
 
-            // Calculate the distance from the collectable to the player
             float distanceToPlayer = Vector2.Distance(transform.position, collectable.transform.position);
 
-            // Calculate the attraction speed based on the distance (the closer the collectable, the faster it moves)
-            float velocityMagnitude = attractionSpeed * (1 - Mathf.Pow(distanceToPlayer / maxAttractionDistance, 2));
+            float velocityMagnitude = _collectableAttractionSpeed * (1 - Mathf.Pow(distanceToPlayer / _maxAttractionDistance, 2));
 
-            // Set the velocity of the collectable to move towards the player
             collectable.GetComponent<Rigidbody2D>().velocity = directionToPlayer * velocityMagnitude;
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Check if the colliding object is in the collectable layer
-        if (collectableLayer == (collectableLayer | (1 << collision.gameObject.layer)))
+        if (_collectableLayer == (_collectableLayer | (1 << collision.gameObject.layer)))
         {
-            AudioController.Instance.PlaySound(collectClip, 0.2f);
+            AudioController.Instance.PlaySound(_collectAudioClip, 0.2f);
 
-            rampingController.IncreaseRamping(rampingPerCollectable);
-            // Hide the sprite of the collectable
+            _rampingController.IncreaseRamping(_rampingPerCollectable);
+
             SpriteRenderer spriteRenderer = collision.gameObject.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
@@ -65,12 +63,11 @@ public class Collector : MonoBehaviour
                 collision.enabled = false;
             }
 
-            // Start the coroutine to lerp the trail renderer time and destroy the collectable after a short delay
-            StartCoroutine(LerpTrailAndDestroy(collision.gameObject, destroyDelay));
+            StartCoroutine(Co_LerpTrailAndDestroy(collision.gameObject, _destroyCollectableDelay));
         }
     }
 
-    IEnumerator LerpTrailAndDestroy(GameObject obj, float delay)
+    private IEnumerator Co_LerpTrailAndDestroy(GameObject obj, float delay)
     {
         TrailRenderer trail = obj.GetComponent<TrailRenderer>();
         float initialTime = trail.time;

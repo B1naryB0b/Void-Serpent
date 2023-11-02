@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2758210917319977770}
   - component: {fileID: 1916173796}
   - component: {fileID: 6286712533742878284}
+  - component: {fileID: 4485256414192071137}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: GameController
@@ -59,14 +60,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7db567898e65e1d488e55703900ae46e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelTransform: {fileID: 0}
-  playerTransform: {fileID: 0}
-  cameraTransform: {fileID: 0}
-  MAX_TRANSLATIONAL_SHAKE: 2
-  MAX_ROTATIONAL_SHAKE: 10
-  slider: {fileID: 0}
-  shakeSpeed: 15
-  intensity: 10
+  _cameraTransform: {fileID: 0}
+  _maxTranslationalShake: 2
+  _maxRotationalShake: 10
+  _useSetTrauma: 0
+  _shakeTraumaSlider: {fileID: 0}
+  _shakeSpeed: 15
+  _shakeIntensity: 10
 --- !u!82 &1916173796
 AudioSource:
   m_ObjectHideFlags: 0
@@ -175,19 +175,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3556d6cb60cd3e444b9b500b8a144f43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ramping: 40
-  maxRamping: 120
-  minRamping: 0
-  rampingDecays:
+  _ramping: 0
+  _maxRamping: 120
+  _minRamping: 0
+  _rampingDecayPerTier:
   - 0.5
   - 4
   - 8
-  - 16
-  rampingTierSizes:
-  - 5
-  - 25
+  - 20
+  _rampingTierSizes:
+  - 10
+  - 30
   - 50
   - 80
-  rampingSlider: {fileID: 0}
-  rampingText: {fileID: 0}
-  rampingTier: 0
+  _rampingSlider: {fileID: 0}
+  _rampingText: {fileID: 0}
+  CurrentRampingTier: 0
+--- !u!114 &4485256414192071137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6491009936822914443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0aff00fea19142a07ee14bb0102a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frameRange: 60
+  displayText: {fileID: 0}

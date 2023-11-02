@@ -99,20 +99,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c61b70edb72cbe4f8a06c3b66acaf23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lives: 15
-  fireRate: 10
-  fireRateVariance: 0.1
-  fireRange: 0
-  aimError: 30
-  bulletPrefab: {fileID: 5576494415565334551, guid: 07fef3b4eab239e45b92bfec83804b36,
+  lives: 3
+  _fireRate: 1
+  _fireRateVariance: 0.1
+  _fireRange: 50
+  _aimErrorAngle: 10
+  _bulletPrefab: {fileID: 5576494415565334551, guid: 07fef3b4eab239e45b92bfec83804b36,
     type: 3}
-  bulletSpawnPoint: {fileID: 7956602979773405995}
-  explosionPrefab: {fileID: 3769043488982995517, guid: e8bd399ce7f727c439df519b15d39b19,
+  _bulletSpawnPoint: {fileID: 7956602979773405995}
+  _explosionPrefab: {fileID: 3769043488982995517, guid: e8bd399ce7f727c439df519b15d39b19,
     type: 3}
-  explosionClip: {fileID: 8300000, guid: ac57cf2e26d0c954da0027cced9fb743, type: 3}
-  collectablePrefab: {fileID: 6479000173641578422, guid: 0d4305f5261e1564eb985e478eaa4687,
+  _explosionClip: {fileID: 8300000, guid: ac57cf2e26d0c954da0027cced9fb743, type: 3}
+  _collectablePrefab: {fileID: 6479000173641578422, guid: 0d4305f5261e1564eb985e478eaa4687,
     type: 3}
-  fireSound: {fileID: 8300000, guid: 8f0314c770430a541a6faa2633c408b0, type: 3}
+  _fireSound: {fileID: 8300000, guid: 8f0314c770430a541a6faa2633c408b0, type: 3}
 --- !u!61 &1729763167240535367
 BoxCollider2D:
   m_ObjectHideFlags: 0

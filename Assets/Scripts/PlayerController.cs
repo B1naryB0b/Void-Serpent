@@ -6,22 +6,20 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
-    // Member Variables
-      // Rate at which thrust decreases when pressing S
-    [SerializeField] private float rotationSpeed = 200.0f;     // Speed of rotation towards the mouse
-    [SerializeField] private float brakeStrength = 10.0f;
-    [SerializeField] private float brakeStoppingVelocity = 0.5f;
+    [SerializeField] private float _rotationSpeed;
+    [SerializeField] private float _brakeStrength;
+    [SerializeField] private float _brakeStoppingVelocity;
 
 
-    private Vector2 currentThrust = Vector2.zero;
+    private Vector2 _currentThrust = Vector2.zero;
 
-    private Rigidbody2D playerRb;                  // Player's Rigidbody2D component
+    private Rigidbody2D _playerRb;
 
-    private Inertial inertialMovement;
-    private Linear linearMovement;
-    private Tank tankMovement;
+    private Inertial _inertialMovement;
+    private Linear _linearMovement;
+    private Tank _tankMovement;
 
-    private Thrusters thrusters;
+    private Thrusters _thrusters;
 
     #region Movement Modes
     private const int INERTIA_CODE = 0;
@@ -41,39 +39,37 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        inertialMovement = GetComponent<Inertial>();
-        linearMovement = GetComponent<Linear>();
-        tankMovement = GetComponent<Tank>();
+        _inertialMovement = GetComponent<Inertial>();
+        _linearMovement = GetComponent<Linear>();
+        _tankMovement = GetComponent<Tank>();
 
-        thrusters = GetComponent<Thrusters>();
+        _thrusters = GetComponent<Thrusters>();
 
-        playerRb = GetComponent<Rigidbody2D>();
+        _playerRb = GetComponent<Rigidbody2D>();
+
         movementMode = MovementMode.Linear;
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         MovePlayer();
         RotateTowardsMouse();
-        thrusters.UpdateThrustTrail(playerRb);
+        _thrusters.UpdateThrustTrail(_playerRb);
     }
 
-    // Handle thrust input and apply force
     private void MovePlayer()
     {
-        //print(movementMode);
         if (movementMode == MovementMode.Inertia)
         {
-            inertialMovement.UpdateMovement(playerRb, currentThrust);
+            _inertialMovement.UpdateMovement(_playerRb, _currentThrust);
         }
         else if (movementMode == MovementMode.Linear)
         {
-            linearMovement.UpdateMovement(playerRb);
+            _linearMovement.UpdateMovement(_playerRb);
         }
         else if (movementMode == MovementMode.Tank)
         {
-            tankMovement.UpdateMovement(playerRb, currentThrust);
+            _tankMovement.UpdateMovement(_playerRb, _currentThrust);
         }
         else
         {
@@ -82,28 +78,26 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftControl))
         {
-            Brake(playerRb);
+            Brake(_playerRb);
         }
     }
 
     private void Brake(Rigidbody2D rb)
     {
-        rb.velocity = Vector3.Lerp(rb.velocity, rb.velocity * 0.9f, brakeStrength * Time.fixedDeltaTime);
-        if (rb.velocity.sqrMagnitude < brakeStoppingVelocity)
+        rb.velocity = Vector3.Lerp(rb.velocity, rb.velocity * 0.9f, _brakeStrength * Time.fixedDeltaTime);
+        if (rb.velocity.sqrMagnitude < _brakeStoppingVelocity)
         {
             rb.velocity = Vector2.zero;
         }
-        currentThrust = Vector2.zero;
+        _currentThrust = Vector2.zero;
     }
 
-    // Rotate the spaceship to face the direction of the mouse
     private void RotateTowardsMouse()
     {
         if (movementMode != MovementMode.Tank)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            // Create a plane with the normal in the negative z-direction, where the player is located.
             float distanceToPlane;
             Plane playerPlane = new Plane(-Vector3.forward, transform.position);
             if (playerPlane.Raycast(ray, out distanceToPlane))
@@ -111,16 +105,16 @@ public class PlayerController : MonoBehaviour
                 Vector3 pointOnPlane = ray.GetPoint(distanceToPlane);
                 Vector3 direction = pointOnPlane - transform.position;
 
-                direction.z = 0;  // Keep the direction on the player's plane
+                direction.z = 0;
 
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
                 Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.fixedDeltaTime);
             }
         }
         else if (movementMode == MovementMode.Tank)
         {
-            transform.Rotate(new Vector3(0, 0, Input.GetAxisRaw("Horizontal") * rotationSpeed));
+            transform.Rotate(new Vector3(0, 0, Input.GetAxisRaw("Horizontal") * _rotationSpeed));
         }
     }
 

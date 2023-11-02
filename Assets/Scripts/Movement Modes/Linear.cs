@@ -6,9 +6,9 @@ public class Linear : MonoBehaviour
 {
     [SerializeField] private float maxLinearVelocity = 20.0f;
     [SerializeField] private float accelerationCurveMultiplier = 10.0f;
-    [SerializeField] private AnimationCurve accelerationCurve; // Animation curve for acceleration
-    private float currentAccelerationTime = 0.0f; // To keep track of the time for the curve
-    private Vector2 previousInput; // To store the previous frame's input
+    [SerializeField] private AnimationCurve accelerationCurve;
+    private float currentAccelerationTime = 0.0f;
+    private Vector2 previousInput;
 
     public void UpdateMovement(Rigidbody2D rb)
     {

@@ -16,7 +16,17 @@ public class Spawner2D : MonoBehaviour
 
     public BoidSettings2D settings;
 
+    public bool randomSpawn;
+    public Vector2 startDirection;
+
     void Awake()
+    {
+        Vector2 spawnDirection = randomSpawn ? Random.insideUnitCircle.normalized : startDirection;
+        Spawner(spawnDirection);
+    }
+
+
+    private void Spawner(Vector2 startDirection)
     {
         for (int i = 0; i < spawnCount; i++)
         {
@@ -25,8 +35,9 @@ public class Spawner2D : MonoBehaviour
 
             Boid2D boid = Instantiate(prefab);
             boid.transform.position = pos;
-            Vector2 randomDirection = Random.insideUnitCircle.normalized;
-            boid.transform.up = new Vector3(randomDirection.x, randomDirection.y, 0);
+
+            // Set the boid's direction to the specified start direction
+            boid.transform.up = new Vector3(startDirection.x, startDirection.y, 0);
 
             boid.SetColour(colour);
 
@@ -37,7 +48,8 @@ public class Spawner2D : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+
+    void OnDrawGizmos()
     {
         if (showSpawnRegion == GizmoType.Always)
         {
@@ -55,11 +67,8 @@ public class Spawner2D : MonoBehaviour
 
     void DrawGizmos()
     {
-        // Drawing a semi-transparent sphere to indicate the spawn area.
         Gizmos.color = new Color(colour.r, colour.g, colour.b, 0.3f);
-
-        // In a 2D game, it's more common to draw a circle instead of a sphere for gizmos.
-        // This represents the 2D spawn area. The 'transform.position' assumes it's at the center of the circle.
-        Gizmos.DrawWireSphere(transform.position, spawnRadius); // DrawWireSphere is okay here because it helps visualize a 2D circle in the 3D space of the Unity editor.
+        Gizmos.DrawWireSphere(transform.position, spawnRadius);
     }
+
 }

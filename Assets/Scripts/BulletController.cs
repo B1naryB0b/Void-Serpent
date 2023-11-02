@@ -6,14 +6,20 @@ public class BulletController : MonoBehaviour
     public float speed = 10.0f;       // Speed of the bullet
     public int damage = 1;            // Damage dealt by the bullet
     public float lifeTime = 5.0f;     // Time after which the bullet will be destroyed
+    [Range(0f, 1f)]
+    public float lifeTimeMultiplier;
+    private float activeTime;
 
     public AudioClip hitEnemySound;     // Sound effect when bullet hits an enemy
     public AudioClip hitPlayerSound;    // Sound effect when bullet hits the player
+
+    public AnimationCurve speedCurve;
 
     private void Start()
     {
         // Destroy the bullet after a certain time to prevent memory leaks
         Destroy(gameObject, lifeTime);
+        activeTime = Time.time;
     }
 
 
@@ -21,7 +27,7 @@ public class BulletController : MonoBehaviour
     private void Update()
     {
         // Move the bullet in its forward direction
-        transform.Translate(Vector3.up * speed * Time.deltaTime);
+        transform.Translate(Vector3.up * speed * Time.deltaTime * speedCurve.Evaluate((Time.time - activeTime)/(lifeTime * lifeTimeMultiplier)));
     }
 
     void OnTriggerEnter2D(Collider2D other)

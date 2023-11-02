@@ -1,51 +1,49 @@
 using UnityEngine;
-using UnityEngine.UI; // Make sure to add this using if you plan to output text to a UI component.
 using TMPro;
 
 public class FPSCounter : MonoBehaviour
 {
-    public int frameRange = 60; // Number of frames to measure for the average count.
+    [SerializeField] private int _frameRange;
 
-    public TextMeshProUGUI displayText; // Optional: assign a UI Text component to output the FPS values.
+    [SerializeField] private TextMeshProUGUI _fpsDisplayText;
 
-    private int[] fpsBuffer;
-    private int fpsBufferIndex;
+    private int[] _fpsBuffer;
+    private int _fpsBufferIndex;
 
-    private int highestFPS;
-    private int lowestFPS;
+    private int _highestFPS;
+    private int _lowestFPS;
 
     private void InitializeBuffer()
     {
-        if (frameRange <= 0)
+        if (_frameRange <= 0)
         {
-            frameRange = 1;
+            _frameRange = 1;
         }
-        fpsBuffer = new int[frameRange];
-        fpsBufferIndex = 0;
+        _fpsBuffer = new int[_frameRange];
+        _fpsBufferIndex = 0;
     }
 
     private void Update()
     {
-        if (fpsBuffer == null || fpsBuffer.Length != frameRange)
+        if (_fpsBuffer == null || _fpsBuffer.Length != _frameRange)
         {
             InitializeBuffer();
         }
         UpdateBuffer();
         CalculateFPS();
 
-        // Optional: Display it on a UI text element.
-        if (displayText != null)
+        if (_fpsDisplayText != null)
         {
-            displayText.text = $"Average FPS: {GetAverageFPS()} \n Highest: {highestFPS} \n Lowest: {lowestFPS}";
+            _fpsDisplayText.text = $"Average FPS: {GetAverageFPS()} \n Highest: {_highestFPS} \n Lowest: {_lowestFPS}";
         }
     }
 
     private void UpdateBuffer()
     {
-        fpsBuffer[fpsBufferIndex++] = (int)(1f / Time.unscaledDeltaTime);
-        if (fpsBufferIndex >= frameRange)
+        _fpsBuffer[_fpsBufferIndex++] = (int)(1f / Time.unscaledDeltaTime);
+        if (_fpsBufferIndex >= _frameRange)
         {
-            fpsBufferIndex = 0;
+            _fpsBufferIndex = 0;
         }
     }
 
@@ -54,9 +52,9 @@ public class FPSCounter : MonoBehaviour
         int sum = 0;
         int highest = 0;
         int lowest = int.MaxValue;
-        for (int i = 0; i < frameRange; i++)
+        for (int i = 0; i < _frameRange; i++)
         {
-            int fps = fpsBuffer[i];
+            int fps = _fpsBuffer[i];
             sum += fps;
             if (fps > highest)
             {
@@ -67,17 +65,17 @@ public class FPSCounter : MonoBehaviour
                 lowest = fps;
             }
         }
-        highestFPS = highest;
-        lowestFPS = lowest == int.MaxValue ? 0 : lowest; // In case we don't have enough frames accumulated.
+        _highestFPS = highest;
+        _lowestFPS = lowest == int.MaxValue ? 0 : lowest;
     }
 
     private int GetAverageFPS()
     {
         int sum = 0;
-        for (int i = 0; i < frameRange; i++)
+        for (int i = 0; i < _frameRange; i++)
         {
-            sum += fpsBuffer[i];
+            sum += _fpsBuffer[i];
         }
-        return (int)((float)sum / frameRange);
+        return (int)((float)sum / _frameRange);
     }
 }

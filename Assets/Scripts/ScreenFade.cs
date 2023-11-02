@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -7,100 +6,70 @@ using UnityEngine.SceneManagement;
 
 public class ScreenFade : MonoBehaviour
 {
-    [SerializeField] private Image blackoutScreen;
-    [SerializeField] private TextMeshProUGUI endText;
-    [SerializeField] private TextMeshProUGUI retryButtonText;
-    [SerializeField] private Button retryButton;
+    [SerializeField] private Image _blackoutScreen;
+    [SerializeField] private TextMeshProUGUI _endScreenText;
+    [SerializeField] private TextMeshProUGUI _retryButtonText;
+    [SerializeField] private Button _retryButton;
+    [SerializeField] private TextMeshProUGUI _nextLevelButtonText;
+    [SerializeField] private Button _nextLevelButton;
 
-    [SerializeField] private TextMeshProUGUI nextLevelButtonText;
-    [SerializeField] private Button nextLevelButton;
+    [SerializeField] private Color _endTextColor;
+    [SerializeField] private Color _retryButtonTextColor;
+    [SerializeField] private Color _nextLevelButtonTextColor;
 
 
-    [SerializeField] private Color endTextColor;
-    [SerializeField] private Color retryButtonTextColor;
-    [SerializeField] private Color nextLevelButtonTextColor;
-
-    private void Start()
+    public enum FadeState
     {
-
+        EndScreen,
+        NextLevelScreen,
     }
 
-    // Coroutine for fading the screen
-    private IEnumerator FadeScreenCoroutine(Color targetColor, float duration)
+    private IEnumerator Co_Fade<T>(T component, Color targetColor, float duration) where T : Graphic
     {
-        Color startColor = blackoutScreen.color;
+        Color startColor = component.color;
         float startTime = Time.time;
 
         while (Time.time < startTime + duration)
         {
             float t = (Time.time - startTime) / duration;
-            blackoutScreen.color = Color.Lerp(startColor, targetColor, t);
+            component.color = Color.Lerp(startColor, targetColor, t);
             yield return null;
         }
 
-        blackoutScreen.color = targetColor; // Ensure final color is reached
+        component.color = targetColor;
     }
 
-    // Coroutine for fading the text element
-    private IEnumerator FadeTextCoroutine(TextMeshProUGUI textElement, Color targetColor, float duration)
+    public void FadeScreen(Color targetColor, float duration)
     {
-        Color startColor = textElement.color;
-        float startTime = Time.time;
+        StartCoroutine(Co_Fade(_blackoutScreen, targetColor, duration));
+    }
 
-        while (Time.time < startTime + duration)
+    public void TriggerScreen(FadeState state, float duration)
+    {
+        switch (state)
         {
-            float t = (Time.time - startTime) / duration;
-            textElement.color = Color.Lerp(startColor, targetColor, t);
-            yield return null;
+            case FadeState.EndScreen:
+                FadeScreen(Color.black, duration);
+                StartCoroutine(Co_Fade(_endScreenText, _endTextColor, duration));
+                StartCoroutine(Co_Fade(_retryButtonText, _retryButtonTextColor, duration));
+                _retryButton.interactable = true;
+                break;
+
+            case FadeState.NextLevelScreen:
+                FadeScreen(Color.black, duration);
+                StartCoroutine(Co_Fade(_nextLevelButtonText, _nextLevelButtonTextColor, duration));
+                _nextLevelButton.interactable = true;
+                break;
         }
-
-        textElement.color = targetColor; // Ensure final color is reached
-    }
-
-    // Method to fade the image to black
-    public void FadeToBlack(float duration)
-    {
-        StartCoroutine(FadeScreenCoroutine(Color.black, duration));
-    }
-
-    // Method to fade the image to clear
-    public void FadeToClear(float duration)
-    {
-        StartCoroutine(FadeScreenCoroutine(Color.clear, duration));
-    }
-
-    // Method to trigger the end screen
-    public void TriggerEndScreen(float duration)
-    {
-        // Start fading the screen to black and text elements to their target color
-        StartCoroutine(FadeScreenCoroutine(Color.black, duration));
-        StartCoroutine(FadeTextCoroutine(endText, endTextColor, duration));
-        StartCoroutine(FadeTextCoroutine(retryButtonText, retryButtonTextColor, duration));
-
-        // Make the "Retry" button interactible
-        retryButton.interactable = true;
-    }
-
-    // Method to trigger the end screen
-    public void TriggerNextLevelScreen(float duration)
-    {
-        // Start fading the screen to black and text elements to their target color
-        StartCoroutine(FadeScreenCoroutine(Color.black, duration));
-        StartCoroutine(FadeTextCoroutine(nextLevelButtonText, nextLevelButtonTextColor, duration));
-
-        // Make the "Retry" button interactible
-        nextLevelButton.interactable = true;
     }
 
     public void NewLevel()
     {
-        StartCoroutine(FadeTextCoroutine(nextLevelButtonText, Color.clear, 0.1f));
+        StartCoroutine(Co_Fade(_nextLevelButtonText, Color.clear, 0.1f));
     }
 
-    // Method to retry the scene
     public void RetryScene()
     {
-        // Reload the current scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

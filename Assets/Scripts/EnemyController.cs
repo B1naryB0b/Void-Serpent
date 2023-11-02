@@ -5,115 +5,108 @@ using UnityEngine.Rendering;
 
 public class EnemyController : MonoBehaviour
 {
-    // Member Variables
-    public int lives = 3; // Number of lives the enemy has
+    [SerializeField] private int lives;
 
-    public float fireRate = 1.0f;            // Rate at which the enemy can shoot\
-    public float fireRateVariance = 0.1f;
-    public float fireRange;
-    public float aimError;
+    [SerializeField] private float _fireRate;
+    [SerializeField] private float _fireRateVariance;
+    [SerializeField] private float _fireRange;
+    [SerializeField] private float _aimErrorAngle;
 
-    public GameObject bulletPrefab;          // Prefab for the enemy's bullet
-    public Transform bulletSpawnPoint;       // Point from where the bullet will be spawned
-    private Transform target;                 // Reference to the player (as the target)
+    [SerializeField] private GameObject _bulletPrefab;
+    [SerializeField] private Transform _bulletSpawnPoint;
+    
+    [SerializeField] private GameObject _explosionPrefab;
+    [SerializeField] private AudioClip _explosionClip;
 
-    public GameObject explosionPrefab;
-    public AudioClip explosionClip;
+    [SerializeField] private GameObject _collectablePrefab;
 
-    public GameObject collectablePrefab;
+    [SerializeField] private AudioClip _fireSound;
 
-    public AudioClip fireSound;         // Sound effect when bullet is fired
+    private float _nextFireTime;
 
-    private float nextFireTime;      // Time when the enemy can shoot next
+    private Transform _target;
 
+    private RampingController _rampingController;
 
-    private RampingController rampingController;
-
-    private bool playerInCrosshair;
+    private bool _playerInCrosshair;
 
     private void Start()
     {
-        target = FindObjectOfType<PlayerController>().transform;
-        rampingController = FindObjectOfType<RampingController>().GetComponent<RampingController>();
+        PlayerController playerController = FindObjectOfType<PlayerController>();
 
-        print(target.name);
-        print(rampingController.name);
+        if (playerController != null )
+        {
+            _target = playerController.transform;
+        }
+        _rampingController = FindObjectOfType<RampingController>().GetComponent<RampingController>();
 
-        nextFireTime = (1/fireRate) + Random.Range(-fireRateVariance, fireRateVariance);
+        print(_target.name);
+        print(_rampingController.name);
 
-        StartCoroutine(ShootingRoutine());
+        _nextFireTime = (1/_fireRate) + Random.Range(-_fireRateVariance, _fireRateVariance);
+
+        StartCoroutine(Co_FireLoop());
 
     }
 
-    // Rotate towards the player with a degree of error and smooth rotation
     private bool CrosshairCheck()
     {
-        if (target == null) return false;
+        if (_target == null) return false;
 
-        // Correcting the layer mask usage. This line was potentially causing the issue.
-        int layerMask = 1 << LayerMask.NameToLayer("Player"); // it's crucial to shift bits for the mask, not direct use.
+        int layerMask = 1 << LayerMask.NameToLayer("Player");
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, fireRange, layerMask);
-        return hit.collider != null; // ensure we hit something.
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, _fireRange, layerMask);
+        return hit.collider != null;
     }
 
-    private IEnumerator ShootingRoutine()
+    private IEnumerator Co_FireLoop()
     {
-        // Initial wait before the loop starts.
-        yield return new WaitForSeconds(nextFireTime);
+        yield return new WaitForSeconds(_nextFireTime);
 
-        while (true) // creates an endless loop until the enemy is destroyed or the game ends.
+        while (true)
         {
-            playerInCrosshair = CrosshairCheck();
+            _playerInCrosshair = CrosshairCheck();
 
-            // If the player is in crosshair, shoot.
-            if (playerInCrosshair)
+            if (_playerInCrosshair)
             {
-                Shoot();
-                // Calculate the next fire time with variance.
-                nextFireTime = (1 / fireRate) + Random.Range(-fireRateVariance, fireRateVariance);
+                Fire();
+                _nextFireTime = (1 / _fireRate) + Random.Range(-_fireRateVariance, _fireRateVariance);
             }
 
-            // Wait for the calculated time until the next shot.
-            yield return new WaitForSeconds(nextFireTime);
+            yield return new WaitForSeconds(_nextFireTime);
         }
     }
 
 
-    private void Shoot()
+    private void Fire()
     {
-        if (bulletPrefab && bulletSpawnPoint)
+        if (_bulletPrefab && _bulletSpawnPoint)
         {
-            // Introduce aiming error
-            float errorOffset = Random.Range(-aimError, aimError);
-            Quaternion bulletAngle = Quaternion.Euler(bulletSpawnPoint.eulerAngles.x, bulletSpawnPoint.eulerAngles.y, bulletSpawnPoint.eulerAngles.z + errorOffset);
-            Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletAngle);
+            float errorOffset = Random.Range(-_aimErrorAngle, _aimErrorAngle);
+            Quaternion bulletAngle = Quaternion.Euler(_bulletSpawnPoint.eulerAngles.x, _bulletSpawnPoint.eulerAngles.y, _bulletSpawnPoint.eulerAngles.z + errorOffset);
+            Instantiate(_bulletPrefab, _bulletSpawnPoint.position, bulletAngle);
 
             float volume = 0.1f;
-            AudioController.Instance.PlaySound(fireSound, volume);
+            AudioController.Instance.PlaySound(_fireSound, volume);
 
         }
     }
 
 
-
-    // Reduce enemy's health by the given damage
     public void TakeDamage(int damage)
     {
         lives -= damage;
 
-        //rampingController.IncreaseRamping(damage);
-
-        // Update the visual representation of lives (if any)
         UpdateLivesDisplay();
 
-        // Check if the enemy is out of lives
         if (lives <= 0)
         {
             Debug.Log($"Enemy {gameObject.name} destroyed!");
-            AudioController.Instance.PlaySound(explosionClip, 0.15f);
-            Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
-            Instantiate(collectablePrefab, gameObject.transform.position, Quaternion.identity );
+            AudioController.Instance.PlaySound(_explosionClip, 0.15f);
+
+            Instantiate(_explosionPrefab, gameObject.transform.position, Quaternion.identity);
+            Instantiate(_collectablePrefab, gameObject.transform.position, Quaternion.identity);
+
             Destroy(gameObject);
         }
         else
@@ -124,7 +117,6 @@ public class EnemyController : MonoBehaviour
 
     private void UpdateLivesDisplay()
     {
-        // For now, we'll just log the remaining lives
         Debug.Log($"Enemy {gameObject.name} lives: {lives}");
     }
 

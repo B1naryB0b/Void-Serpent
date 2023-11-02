@@ -5337,9 +5337,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68669d28c9322794f8f1eebf494888b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 720
-  brakeStrength: 60
-  brakeStoppingVelocity: 0.5
+  _rotationSpeed: 720
+  _brakeStrength: 60
+  _brakeStoppingVelocity: 0.5
 --- !u!114 &369441711824145749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5352,17 +5352,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed658703f7df57b4ba9a04d4e094ff06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 8449120563011413811, guid: 6f14968be716e9741b10d2ed96ca2b9d,
+  _bulletPrefab: {fileID: 8449120563011413811, guid: 6f14968be716e9741b10d2ed96ca2b9d,
     type: 3}
-  bulletSpawnPoints:
+  _bulletSpawnPoints:
   - {fileID: 8164384477229896160}
   - {fileID: 8932380815571345609}
   - {fileID: 7434122835960285648}
   - {fileID: 5352577359984372463}
   - {fileID: 1555242598226159976}
-  fireRate: 0.2
-  fireSound: {fileID: 8300000, guid: 8f0314c770430a541a6faa2633c408b0, type: 3}
-  rampingController: {fileID: 0}
+  _playerShootRate: 5
+  _shootSound: {fileID: 8300000, guid: e56e0958037e2264293f0fd7aac5d0fd, type: 3}
+  _rampingController: {fileID: 0}
 --- !u!50 &-8156990961548694022
 Rigidbody2D:
   serializedVersion: 4
@@ -5399,7 +5399,7 @@ PolygonCollider2D:
   m_GameObject: {fileID: 4746351170598233541}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 931a6b7f8d586164eaa0034d27ef7613, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -5457,7 +5457,7 @@ PolygonCollider2D:
   m_GameObject: {fileID: 4746351170598233541}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 931a6b7f8d586164eaa0034d27ef7613, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -5573,21 +5573,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6de2cf84935cb1c409e528671e30b311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxLives: 4
-  lifeIconPrefab: {fileID: 5481467033942516663, guid: 7a0dab056ef65004abbac9f9c7b8c702,
+  _maxLives: 4
+  _lifeIconPrefab: {fileID: 5481467033942516663, guid: 7a0dab056ef65004abbac9f9c7b8c702,
     type: 3}
-  lifeIconContainer: {fileID: 0}
-  livesUISpacingOffset: 100
-  livesUIHorizontalAdjustmentOffset: 150
-  maxShield: 1
-  explosionPrefab: {fileID: 3769043488982995517, guid: e8bd399ce7f727c439df519b15d39b19,
+  _lifeIconContainer: {fileID: 0}
+  _livesUISpacingOffset: 100
+  _livesUIHorizontalAdjustmentOffset: 150
+  _maxShield: 1
+  _explosionPrefab: {fileID: 3769043488982995517, guid: e8bd399ce7f727c439df519b15d39b19,
     type: 3}
-  shieldedInvulnerabilityDuration: 0.5
-  shieldRegenDelay: 5
-  flashDuration: 0.5
-  fadeDuration: 0.5
-  shieldSprite: {fileID: 3062101245754445172}
-  invulnerabilityDuration: 2
+  _shieldedInvulnerabilityDuration: 0.5
+  _shieldRegenDelay: 5
+  _flashDuration: 0.5
+  _fadeDuration: 0.5
+  _shieldSprite: {fileID: 3062101245754445172}
+  _invulnerabilityDuration: 2
 --- !u!114 &1318785606207519978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5600,15 +5600,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1d51f8d0ee5eda44816e4fa0e029449, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attractionSpeed: 30
-  maxAttractionDistance: 200
-  collectableLayer:
+  _collectableAttractionSpeed: 30
+  _maxAttractionDistance: 200
+  _collectableLayer:
     serializedVersion: 2
     m_Bits: 4096
-  destroyDelay: 0.2
-  collectClip: {fileID: 8300000, guid: 3a0ef328b3e26744f87eb5b78efda18a, type: 3}
-  rampingController: {fileID: 0}
-  rampingPerCollectable: 3
+  _destroyCollectableDelay: 0.2
+  _collectAudioClip: {fileID: 8300000, guid: 3a0ef328b3e26744f87eb5b78efda18a, type: 3}
+  _rampingController: {fileID: 0}
+  _rampingPerCollectable: 3
 --- !u!1 &5558559604997340762
 GameObject:
   m_ObjectHideFlags: 0

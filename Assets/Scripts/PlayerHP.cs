@@ -1,156 +1,133 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static PlayerController;
 
 public class PlayerHP : MonoBehaviour
 {
 
-    public int maxLives = 3;  // Maximum lives of the player
-    private int currentLives; // Current lives of the player
-    public GameObject lifeIconPrefab; // Prefab for the life icon UI
-    public Transform lifeIconContainer; // UI container for the life icons
-    public float livesUISpacingOffset;
-    public float livesUIHorizontalAdjustmentOffset;
+    [SerializeField] private int _maxLives;
+
+    private int _currentLives;
+
+    [SerializeField] private GameObject _lifeIconPrefab;
+    [SerializeField] private Transform _lifeIconContainer;
+    [SerializeField] private float _livesUISpacingOffset;
+    [SerializeField] private float _livesUIHorizontalAdjustmentOffset;
 
 
-    public int maxShield = 1;
-    private int currentShield;
+    [SerializeField] private int _maxShield;
 
-    public GameObject explosionPrefab;
+    private int _currentShield;
 
-    private bool shielded = false;
-    public float shieldedInvulnerabilityDuration = 0.5f;  // Duration of invulnerability in seconds
-    public float shieldRegenDelay = 5f; // Time in seconds before the shield regenerates. Adjust as needed.
-    public float flashDuration = 0.5f; // Duration for the shield to lerp from clear to white. Adjust as needed.
-    public float fadeDuration = 0.5f; // Duration for the shield to fade from white to clear. Adjust as needed.
-    public SpriteRenderer shieldSprite;
+    [SerializeField] private GameObject _explosionPrefab;
 
-    private bool isInvulnerable = false;
-    public float invulnerabilityDuration = 2.0f;  // Duration of invulnerability in seconds
+    [SerializeField] private float _shieldedInvulnerabilityDuration;
+    [SerializeField] private float _shieldRegenDelay;
+    [SerializeField] private float _flashDuration;
+    [SerializeField] private float _fadeDuration;
+    [SerializeField] private SpriteRenderer _shieldSprite;
 
-    // Start is called before the first frame update
-    void Start()
+    private bool _shielded = false;
+
+    [SerializeField] private float _invulnerabilityDuration;
+
+    private bool _isInvulnerable = false;
+
+    private void Start()
     {
-        currentLives = maxLives;
-        shielded = true;
+        _currentLives = _maxLives;
+        _shielded = true;
         UpdateLifeUI();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    // Reduce player's health by the given damage
     public void TakeDamage(int damage)
     {
         ScreenShaker.Instance.Shake(damage / 2f);
 
-        if (isInvulnerable)
+        if (_isInvulnerable)
             return;
 
-        if (shielded)
+        if (_shielded)
         {
-            currentShield -= damage;
-            if (currentShield <= 0)
+            _currentShield -= damage;
+            if (_currentShield <= 0)
             {
-                shielded = false;
-                StartCoroutine(FlashAndFadeShield());
-                StartCoroutine(InvulnerabilityCoroutine(shieldedInvulnerabilityDuration));
-                StartCoroutine(RegenShield());
+                _shielded = false;
+                StartCoroutine(Co_FlashAndFadeShield());
+                StartCoroutine(Co_InvulnerabilityTime(_shieldedInvulnerabilityDuration));
+                StartCoroutine(Co_RegenShield());
             }
         }
         else
         {
-            currentLives -= damage;
+            _currentLives -= damage;
             UpdateLifeUI();
-            Debug.Log(currentLives);
+            Debug.Log(_currentLives);
 
-            if (currentLives <= 0)
+            if (_currentLives <= 0)
             {
-                // Player is out of lives. Handle game over logic here.
                 Debug.Log("Game Over!");
-                Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
+                Instantiate(_explosionPrefab, gameObject.transform.position, Quaternion.identity);
                 Destroy(gameObject);
             }
             else
             {
-                // Start invulnerability coroutine
-                StartCoroutine(InvulnerabilityCoroutine(invulnerabilityDuration));
+                StartCoroutine(Co_InvulnerabilityTime(_invulnerabilityDuration));
             }
         }
     }
 
     private void UpdateLifeUI()
     {
-        // Destroy all existing life icons
-        foreach (Transform child in lifeIconContainer)
+        foreach (Transform child in _lifeIconContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // Instantiate life icons based on current lives
-        for (int i = 0; i < currentLives; i++)
+        for (int i = 0; i < _currentLives; i++)
         {
-            GameObject lifeIcon = Instantiate(lifeIconPrefab, lifeIconContainer.transform); // Instantiates and sets the parent in one step
-            lifeIcon.transform.localPosition = new Vector3(i * livesUISpacingOffset - livesUIHorizontalAdjustmentOffset, 0, 0);
+            GameObject lifeIcon = Instantiate(_lifeIconPrefab, _lifeIconContainer.transform);
+            lifeIcon.transform.localPosition = new Vector3(i * _livesUISpacingOffset - _livesUIHorizontalAdjustmentOffset, 0, 0);
         }
     }
 
 
-    private IEnumerator InvulnerabilityCoroutine(float duration)
+    private IEnumerator Co_InvulnerabilityTime(float duration)
     {
-        isInvulnerable = true;
-        // Optionally, you can add visual feedback for invulnerability, like blinking the player sprite.
+        _isInvulnerable = true;
 
         yield return new WaitForSeconds(duration);
 
-        isInvulnerable = false;
-        // Optionally, revert any visual feedback for invulnerability.
+        _isInvulnerable = false;
     }
 
-    IEnumerator FlashAndFadeShield()
+    private IEnumerator Co_FlashAndFadeShield()
     {
-        // Flash the shield color to white
-        shieldSprite.color = Color.white;
-        yield return new WaitForSeconds(0.1f); // Duration of the white flash
+        _shieldSprite.color = Color.white;
+        yield return new WaitForSeconds(0.1f);
 
-        // Lerp the shield color to clear
-        float duration = 0.5f; // Duration of the fade to clear
+        yield return Co_ChangeSpriteColor(_shieldSprite, _fadeDuration, Color.white, Color.clear);
+    }
+
+    private IEnumerator Co_RegenShield()
+    {
+        yield return new WaitForSeconds(_shieldRegenDelay);
+        _currentShield = _maxShield;
+        _shielded = true;
+
+        yield return Co_ChangeSpriteColor(_shieldSprite, _flashDuration, Color.clear, Color.white);
+
+        yield return Co_ChangeSpriteColor(_shieldSprite, _fadeDuration, Color.white, Color.clear);
+    }
+
+    private IEnumerator Co_ChangeSpriteColor(SpriteRenderer spriteRenderer, float duration, Color startColor, Color endColor)
+    {
         float elapsedTime = 0f;
+
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            shieldSprite.color = Color.Lerp(Color.white, Color.clear, elapsedTime / duration);
-            yield return null;
-        }
-    }
-
-    IEnumerator RegenShield()
-    {
-        yield return new WaitForSeconds(shieldRegenDelay);
-        currentShield = maxShield;
-        shielded = true;
-
-        // Lerp shield color from clear to white
-        float elapsedTime = 0f;
-        while (elapsedTime < flashDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            shieldSprite.color = Color.Lerp(Color.clear, Color.white, elapsedTime / flashDuration);
-            yield return null;
-        }
-
-        // Reset elapsedTime for the fade back to clear
-        elapsedTime = 0f;
-
-        // Lerp shield color from white to clear
-        while (elapsedTime < fadeDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            shieldSprite.color = Color.Lerp(Color.white, Color.clear, elapsedTime / fadeDuration);
+            spriteRenderer.color = Color.Lerp(startColor, endColor, elapsedTime / duration);
             yield return null;
         }
     }

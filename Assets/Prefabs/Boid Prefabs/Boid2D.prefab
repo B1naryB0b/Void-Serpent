@@ -78,7 +78,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: 21300000, guid: f8653d797a4e3e949bd03eccae548084, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 33952df78867b4d4ba6146ea30e2e3b0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -120,19 +120,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lives: 3
-  fireRate: 1
-  fireRateVariance: 0.1
-  fireRange: 50
-  aimError: 5
-  bulletPrefab: {fileID: 5576494415565334551, guid: 07fef3b4eab239e45b92bfec83804b36,
+  _fireRate: 1
+  _fireRateVariance: 0.1
+  _fireRange: 50
+  _aimErrorAngle: 10
+  _bulletPrefab: {fileID: 5576494415565334551, guid: 07fef3b4eab239e45b92bfec83804b36,
     type: 3}
-  bulletSpawnPoint: {fileID: 8634280681834534184}
-  explosionPrefab: {fileID: 3769043488982995517, guid: e8bd399ce7f727c439df519b15d39b19,
+  _bulletSpawnPoint: {fileID: 8634280681834534184}
+  _explosionPrefab: {fileID: 3769043488982995517, guid: e8bd399ce7f727c439df519b15d39b19,
     type: 3}
-  explosionClip: {fileID: 8300000, guid: ac57cf2e26d0c954da0027cced9fb743, type: 3}
-  collectablePrefab: {fileID: 6479000173641578422, guid: 0d4305f5261e1564eb985e478eaa4687,
+  _explosionClip: {fileID: 8300000, guid: ac57cf2e26d0c954da0027cced9fb743, type: 3}
+  _collectablePrefab: {fileID: 6479000173641578422, guid: 0d4305f5261e1564eb985e478eaa4687,
     type: 3}
-  fireSound: {fileID: 8300000, guid: 8f0314c770430a541a6faa2633c408b0, type: 3}
+  _fireSound: {fileID: 8300000, guid: 8f0314c770430a541a6faa2633c408b0, type: 3}
 --- !u!50 &7131295851227710427
 Rigidbody2D:
   serializedVersion: 4
@@ -192,9 +192,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.1}
   serializedVersion: 2
-  m_Radius: 0.4
+  m_Radius: 0.5
 --- !u!58 &5625843160456143135
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -227,6 +227,6 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.1}
   serializedVersion: 2
-  m_Radius: 0.4
+  m_Radius: 0.5

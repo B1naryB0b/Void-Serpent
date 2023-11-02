@@ -6,74 +6,66 @@ using UnityEngine.UI;
 
 public class RampingController : MonoBehaviour
 {
-    [HideInInspector] public float ramping;
+    [HideInInspector] public float _ramping;
 
-    [SerializeField] private float maxRamping;
-    [SerializeField] private float minRamping;
-    [SerializeField] private float[] rampingDecays; 
-    [SerializeField] private float[] rampingTierSizes; 
+    [SerializeField] private float _maxRamping;
+    [SerializeField] private float _minRamping;
+    [SerializeField] private float[] _rampingDecayPerTier; 
+    [SerializeField] private float[] _rampingTierSizes; 
 
-    [SerializeField] private Slider rampingSlider;
-    [SerializeField] private TextMeshProUGUI rampingText;
+    [SerializeField] private Slider _rampingSlider;
+    [SerializeField] private TextMeshProUGUI _rampingText;
 
-    [HideInInspector] public int rampingTier;
+    [HideInInspector] public int CurrentRampingTier;
 
-    // Start is called before the first frame update
     void Start()
     {
-        ramping = 0f;
-        rampingSlider.maxValue = rampingTierSizes[0];
+        _ramping = 0f;
+        _rampingSlider.maxValue = _rampingTierSizes[0];
     }
 
 
     void Update()
     {
-        // Clamp the ramping to its maximum value.
-        ramping = Mathf.Min(ramping, maxRamping);
+        _ramping = Mathf.Min(_ramping, _maxRamping);
 
-        // Check and update the current tier based on ramping value.
         float threshold = 0f;
-        for (int i = 0; i < rampingTierSizes.Length; i++)
+        for (int i = 0; i < _rampingTierSizes.Length; i++)
         {
-            threshold += rampingTierSizes[i];
-            if (ramping <= threshold)
+            threshold += _rampingTierSizes[i];
+            if (_ramping <= threshold)
             {
-                rampingTier = i;
-                rampingSlider.maxValue = rampingTierSizes[rampingTier];
+                CurrentRampingTier = i;
+                _rampingSlider.maxValue = _rampingTierSizes[CurrentRampingTier];
                 break;
             }
         }
 
-        // Update the ramping text display.
-        rampingText.text = Mathf.RoundToInt(ramping).ToString();
+        _rampingText.text = Mathf.RoundToInt(_ramping).ToString();
 
-        // Update the ramping slider value based on the current tier.
-        float baseThreshold = threshold - rampingTierSizes[rampingTier]; // base value for the current tier
-        rampingSlider.value = ramping - baseThreshold;
+        float baseThreshold = threshold - _rampingTierSizes[CurrentRampingTier]; // base value for the current tier
+        _rampingSlider.value = _ramping - baseThreshold;
 
-        // Decay the ramping value.
         DecayRamping();
     }
 
 
     public void IncreaseRamping(float increase)
     {
-        ramping += increase;
+        _ramping += increase;
     }
 
     private void DecayRamping()
     {
-        if (rampingTier >= rampingDecays.Length)
+        if (CurrentRampingTier >= _rampingDecayPerTier.Length)
         {
             Debug.LogError("Ramping tier is out of bounds of the rampingDecays array. Please ensure the array is set up correctly.");
             return;
         }
 
-        // Calculate the decay amount based on the current tier's decay rate.
-        float decayAmount = rampingDecays[rampingTier] * Time.deltaTime;
+        float decayAmount = _rampingDecayPerTier[CurrentRampingTier] * Time.deltaTime;
 
-        // Apply the decay while ensuring the ramping doesn't go below the minimum value.
-        ramping = Mathf.Max(ramping - decayAmount, minRamping);
+        _ramping = Mathf.Max(_ramping - decayAmount, _minRamping);
     }
 
 

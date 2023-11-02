@@ -3,28 +3,24 @@ using UnityEngine.UI;
 
 public class ScreenShaker : MonoBehaviour
 {
-    [SerializeField] private Transform levelTransform;
-    [SerializeField] private Transform playerTransform;
-    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Transform _cameraTransform;
 
+    [SerializeField] private float _maxTranslationalShake;
+    [SerializeField] private float _maxRotationalShake;
 
-    [SerializeField] private float MAX_TRANSLATIONAL_SHAKE = 0.5f;
-    [SerializeField] private float MAX_ROTATIONAL_SHAKE = 15.0f;
+    [SerializeField] private bool _useSetTrauma;
 
-    private float currentTrauma = 0f;
-    private float setTrauma = 0f;
+    private float _currentTrauma;
+    private float _setTrauma;
 
-    [SerializeField] private Slider slider;
-    [SerializeField] private float shakeSpeed;
-    [SerializeField] private float intensity;
+    [SerializeField] private Slider _shakeTraumaSlider;
+    [SerializeField] private float _shakeSpeed;
+    [SerializeField] private float _shakeIntensity;
 
-
-    // Singleton pattern
     public static ScreenShaker Instance { get; private set; }
 
     private void Awake()
     {
-        // Ensure only one instance exists
         if (Instance == null)
         {
             Instance = this;
@@ -38,24 +34,27 @@ public class ScreenShaker : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.U)) 
+        if (_useSetTrauma)
         {
-            setTrauma += 0.1f;
-            setTrauma = Mathf.Clamp01(setTrauma);
-        }
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            setTrauma -= 0.1f;
-            setTrauma = Mathf.Clamp01(setTrauma);
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                _setTrauma += 0.1f;
+            }
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                _setTrauma -= 0.1f;
+            }
+
+            _setTrauma = Mathf.Clamp01(_setTrauma);
+
+            _currentTrauma = _setTrauma; 
         }
 
-        //currentTrauma = setTrauma;
-
-        if (currentTrauma > 0)
+        if (_currentTrauma > 0)
         {
             ApplyShake();
             DecayTrauma();
-            slider.value = currentTrauma;
+            _shakeTraumaSlider.value = _currentTrauma;
         }
     }
 
@@ -66,27 +65,29 @@ public class ScreenShaker : MonoBehaviour
 
     private void ApplyTrauma(float trauma)
     {
-        currentTrauma += trauma;
-        currentTrauma = Mathf.Clamp01(currentTrauma);
+        _currentTrauma += trauma;
+        _currentTrauma = Mathf.Clamp01(_currentTrauma);
     }
 
     private void DecayTrauma()
     {
-        currentTrauma -= Time.deltaTime;
-        currentTrauma = Mathf.Clamp01(currentTrauma);
+        _currentTrauma -= Time.deltaTime;
+        _currentTrauma = Mathf.Clamp01(_currentTrauma);
     }
 
     private void ApplyShake()
     {
-        float shakeMagnitude = currentTrauma * currentTrauma;
+        float shakeMagnitude = _currentTrauma * _currentTrauma;
 
-        float xOffset = MAX_TRANSLATIONAL_SHAKE * shakeMagnitude * (GetPerlinNoise(100, Time.time * shakeSpeed));
-        float yOffset = MAX_TRANSLATIONAL_SHAKE * shakeMagnitude * (GetPerlinNoise(200, Time.time * shakeSpeed));
-        float rotationalOffset = MAX_ROTATIONAL_SHAKE * shakeMagnitude * (GetPerlinNoise(300, Time.time * shakeSpeed));
+        float xOffset = _maxTranslationalShake * shakeMagnitude * (GetPerlinNoise(100, Time.time * _shakeSpeed));
+        float yOffset = _maxTranslationalShake * shakeMagnitude * (GetPerlinNoise(200, Time.time * _shakeSpeed));
 
-        Vector3 newPos = new Vector3(cameraTransform.position.x + xOffset, cameraTransform.position.y + yOffset, cameraTransform.position.z);
-        cameraTransform.position = Vector3.Lerp(cameraTransform.position, newPos, Time.deltaTime * intensity);
-        cameraTransform.rotation = Quaternion.Euler(0, 0, rotationalOffset);
+        float rotationalOffset = _maxRotationalShake * shakeMagnitude * (GetPerlinNoise(300, Time.time * _shakeSpeed));
+
+        Vector3 newPos = new Vector3(_cameraTransform.position.x + xOffset, _cameraTransform.position.y + yOffset, _cameraTransform.position.z);
+
+        _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, newPos, Time.deltaTime * _shakeIntensity);
+        _cameraTransform.rotation = Quaternion.Euler(0, 0, rotationalOffset);
     }
 
     private float GetPerlinNoise(int seed, float time)

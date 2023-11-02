@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1303137738773259116}
   - component: {fileID: 8640091650567150231}
   m_Layer: 0
-  m_Name: Boid2D manager
+  m_Name: Boid2D Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

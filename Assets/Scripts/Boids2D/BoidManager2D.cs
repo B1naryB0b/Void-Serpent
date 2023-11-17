@@ -15,17 +15,21 @@ public class BoidManager2D : MonoBehaviour
 
     void Start()
     {
-        // Initialize all boids in the scene.
+        InitializeBoids();
+    }
+
+    public void InitializeBoids()
+    {
         boids = FindObjectsOfType<Boid2D>();
         foreach (Boid2D b in boids)
         {
-            b.Initialize(settings, target); // Assuming the BoidManager's transform is the target.
+            b.Initialize(settings, target);
         }
     }
 
     void Update()
     {
-        if (boids != null)
+        if ((boids != null) && (boids.Length > 0))
         {
             int numBoids = boids.Length;
             var boidData = new BoidData[numBoids];

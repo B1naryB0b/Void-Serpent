@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
 
     private Vector2 _currentThrust = Vector2.zero;
+    public Vector2 CurrentThrust => _currentThrust != null ? _currentThrust : Vector2.zero;
 
     private Rigidbody2D _playerRb;
 
@@ -36,7 +37,6 @@ public class PlayerController : MonoBehaviour
 
     private MovementMode movementMode;
     #endregion
-
 
     private void Start()
     {
@@ -127,6 +127,7 @@ public class PlayerController : MonoBehaviour
             Vector3 mousePosition = GetMousePositionOnPlayerPlane();
             float signedAngle = CalculateSignedAngleToMouse(mousePosition);
             float yTilt = Mathf.Clamp(signedAngle / 2, -_tiltClampAngle, _tiltClampAngle);
+            Debug.Log(signedAngle);
 
             // Calculate the Z-axis rotation based on the current orientation of the GameObject
             float zRotation = transform.eulerAngles.z;
@@ -153,9 +154,8 @@ public class PlayerController : MonoBehaviour
     private float CalculateSignedAngleToMouse(Vector3 mousePosition)
     {
         Vector3 direction = (mousePosition - transform.position).normalized;
-        Vector3 playerForward = transform.forward;
-        playerForward.z = 0; // Ignore Z-axis for 2D
-        direction.z = 0; // Ignore Z-axis for 2D
+        Debug.DrawRay(transform.position, direction * 5f, Color.red);
+        Vector3 playerForward = transform.up;
         return Vector3.SignedAngle(playerForward, direction, Vector3.forward);
     }
 

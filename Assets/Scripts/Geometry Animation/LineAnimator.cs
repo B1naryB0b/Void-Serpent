@@ -62,7 +62,6 @@ public class LineAnimator : MonoBehaviour
                 Vector3 startPosition = linePoints[i];
                 Vector3 endPosition = linePoints[i + 1];
 
-                Debug.Log(startPosition + " " + endPosition);
 
                 Vector3 pos = startPosition;
                 while (pos != endPosition)

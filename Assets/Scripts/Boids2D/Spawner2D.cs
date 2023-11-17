@@ -15,14 +15,27 @@ public class Spawner2D : MonoBehaviour
     public GizmoType showSpawnRegion;
 
     public BoidSettings2D settings;
+    public BoidManager2D manager;
 
     public bool randomSpawn;
     public Vector2 startDirection;
 
-    void Awake()
+    public bool spawnRepeatedly;
+
+    private bool hasSpawned = false;
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Vector2 spawnDirection = randomSpawn ? Random.insideUnitCircle.normalized : startDirection;
-        Spawner(spawnDirection);
+        if (other.CompareTag("Player"))
+        {
+            if (spawnRepeatedly || !hasSpawned)
+            {
+                Vector2 spawnDirection = randomSpawn ? Random.insideUnitCircle.normalized : startDirection;
+                Spawner(spawnDirection);
+                manager.InitializeBoids();
+                hasSpawned = true; // Set the flag to true after spawning
+            }
+        }
     }
 
 

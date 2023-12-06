@@ -1,9 +1,11 @@
 using UnityEditor;
 using UnityEngine;
+using static TreeEditor.TextureAtlas;
 
 [CustomEditor(typeof(PerlinTextureSettings))]
 public class PerlinTextureGenerator : Editor
 {
+
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
@@ -12,14 +14,13 @@ public class PerlinTextureGenerator : Editor
 
         if (GUILayout.Button("Generate Texture"))
         {
-            GenerateAndSaveTexture(settings);
+            GenerateTexture(settings);
         }
     }
 
-    private void GenerateAndSaveTexture(PerlinTextureSettings settings)
+    private void GenerateTexture(PerlinTextureSettings settings)
     {
         Texture2D texture = new Texture2D(settings.width, settings.height);
-        int numLayers = 20; // Example value, adjust as needed
 
         for (int x = 0; x < texture.width; x++)
         {
@@ -28,13 +29,29 @@ public class PerlinTextureGenerator : Editor
                 float xCoord = (float)x / settings.width;
                 float yCoord = (float)y / settings.height;
                 float sample = MultiLayerPerlin(xCoord, yCoord, settings);
-                sample = GrayscaleStep(sample, numLayers);
+
+                switch (settings.textureMode)
+                {
+                    case PerlinTextureSettings.TextureMode.GrayscaleStep:
+                        sample = GrayscaleStep(sample, settings.numLayers);
+                        break;
+                    case PerlinTextureSettings.TextureMode.LineStep:
+                        sample = LineStep(sample, settings.numLayers, settings.lineWidth);
+                        break;
+                }
+
                 Color color = new Color(sample, sample, sample);
                 texture.SetPixel(x, y, color);
             }
         }
 
         texture.Apply();
+        SaveTexture(texture);
+
+    }
+
+    private void SaveTexture(Texture2D texture)
+    {
 
         byte[] bytes = texture.EncodeToPNG();
         string path = AssetDatabase.GenerateUniqueAssetPath("Assets/Scripts/Topology Mapper/GeneratedPerlinTexture.png");
@@ -63,7 +80,22 @@ public class PerlinTextureGenerator : Editor
         return Mathf.Floor(x / stepSize) * stepSize;
     }
 
+    float LineStep(float value, int numLayers, float lineWidth)
+    {
+        float stepSize = 1f / numLayers;
+        float layerValue = Mathf.Floor(value / stepSize) * stepSize;
 
+        float delta = Mathf.Abs(value - layerValue);
+
+        if (delta < lineWidth / 2f)
+        {
+            return 1f;
+        }
+        else
+        {
+            return layerValue;
+        }
+    }
 
 
 }

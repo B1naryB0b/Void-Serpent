@@ -21,3 +21,6 @@ MonoBehaviour:
     layerWeight: 0.8
   - scale: 12
     layerWeight: 0.6
+  textureMode: 2
+  numLayers: 20
+  lineWidth: 0.005

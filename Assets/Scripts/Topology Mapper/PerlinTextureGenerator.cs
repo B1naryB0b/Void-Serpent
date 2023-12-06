@@ -14,11 +14,12 @@ public class PerlinTextureGenerator : Editor
 
         if (GUILayout.Button("Generate Texture"))
         {
-            GenerateTexture(settings);
+            Texture2D generatedTexture = GenerateTexture(settings);
+            SaveTexture(generatedTexture, settings);
         }
     }
 
-    private void GenerateTexture(PerlinTextureSettings settings)
+    private Texture2D GenerateTexture(PerlinTextureSettings settings)
     {
         Texture2D texture = new Texture2D(settings.width, settings.height);
 
@@ -38,6 +39,10 @@ public class PerlinTextureGenerator : Editor
                     case PerlinTextureSettings.TextureMode.LineStep:
                         sample = LineStep(sample, settings.numLayers, settings.lineWidth);
                         break;
+                    case PerlinTextureSettings.TextureMode.GrayscaleLineStep:
+                        sample = GrayscaleLineStep(sample, settings.numLayers, settings.lineWidth);
+                        break;
+
                 }
 
                 Color color = new Color(sample, sample, sample);
@@ -46,15 +51,15 @@ public class PerlinTextureGenerator : Editor
         }
 
         texture.Apply();
-        SaveTexture(texture);
-
+        return texture;
     }
 
-    private void SaveTexture(Texture2D texture)
-    {
 
+    private void SaveTexture(Texture2D texture, PerlinTextureSettings settings)
+    {
+        string name = settings.name;
         byte[] bytes = texture.EncodeToPNG();
-        string path = AssetDatabase.GenerateUniqueAssetPath("Assets/Scripts/Topology Mapper/GeneratedPerlinTexture.png");
+        string path = AssetDatabase.GenerateUniqueAssetPath("Assets/Scripts/Topology Mapper/" + name + ".png");
         System.IO.File.WriteAllBytes(path, bytes);
         AssetDatabase.Refresh();
     }
@@ -81,6 +86,23 @@ public class PerlinTextureGenerator : Editor
     }
 
     float LineStep(float value, int numLayers, float lineWidth)
+    {
+        float stepSize = 1f / numLayers;
+        float layerValue = Mathf.Floor(value / stepSize) * stepSize;
+
+        float delta = Mathf.Abs(value - layerValue);
+
+        if (delta < lineWidth / 2f)
+        {
+            return 1f;
+        }
+        else
+        {
+            return 0f;
+        }
+    }
+
+    float GrayscaleLineStep(float value, int numLayers, float lineWidth)
     {
         float stepSize = 1f / numLayers;
         float layerValue = Mathf.Floor(value / stepSize) * stepSize;

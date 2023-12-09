@@ -127,7 +127,7 @@ public class PlayerController : MonoBehaviour
             Vector3 mousePosition = GetMousePositionOnPlayerPlane();
             float signedAngle = CalculateSignedAngleToMouse(mousePosition);
             float yTilt = Mathf.Clamp(signedAngle / 2, -_tiltClampAngle, _tiltClampAngle);
-            Debug.Log(signedAngle);
+            //Debug.Log(signedAngle);
 
             // Calculate the Z-axis rotation based on the current orientation of the GameObject
             float zRotation = transform.eulerAngles.z;

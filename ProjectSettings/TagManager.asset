@@ -23,7 +23,7 @@ TagManager:
   - Wall
   - 
   - Planet
-  - 
+  - Moon
   - 
   - 
   - 
@@ -41,7 +41,4 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: Planet
-    uniqueID: 3475914357
     locked: 0

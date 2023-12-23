@@ -40,9 +40,6 @@ public class EnemyController : MonoBehaviour
         }
         _rampingController = FindObjectOfType<RampingController>().GetComponent<RampingController>();
 
-        print(_target.name);
-        print(_rampingController.name);
-
         _nextFireTime = (1/_fireRate) + Random.Range(-_fireRateVariance, _fireRateVariance);
 
         StartCoroutine(Co_FireLoop());

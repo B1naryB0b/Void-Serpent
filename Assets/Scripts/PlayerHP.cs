@@ -5,38 +5,38 @@ using UnityEngine;
 public class PlayerHP : MonoBehaviour
 {
 
-    [SerializeField] private int _maxLives;
+    [SerializeField] private int maxLives;
 
-    private int _currentLives;
+    private int currentLives;
 
-    [SerializeField] private GameObject _lifeIconPrefab;
-    [SerializeField] private Transform _lifeIconContainer;
-    [SerializeField] private float _livesUISpacingOffset;
-    [SerializeField] private float _livesUIHorizontalAdjustmentOffset;
+    [SerializeField] private GameObject lifeIconPrefab;
+    [SerializeField] private Transform lifeIconContainer;
+    [SerializeField] private float livesUISpacingOffset;
+    [SerializeField] private float livesUIHorizontalAdjustmentOffset;
 
 
-    [SerializeField] private int _maxShield;
+    [SerializeField] private int maxShield;
 
-    private int _currentShield;
+    private int currentShield;
 
-    [SerializeField] private GameObject _explosionPrefab;
+    [SerializeField] private GameObject explosionPrefab;
 
-    [SerializeField] private float _shieldedInvulnerabilityDuration;
-    [SerializeField] private float _shieldRegenDelay;
-    [SerializeField] private float _flashDuration;
-    [SerializeField] private float _fadeDuration;
-    [SerializeField] private SpriteRenderer _shieldSprite;
+    [SerializeField] private float shieldedInvulnerabilityDuration;
+    [SerializeField] private float shieldRegenDelay;
+    [SerializeField] private float flashDuration;
+    [SerializeField] private float fadeDuration;
+    [SerializeField] private SpriteRenderer shieldSprite;
 
-    private bool _shielded = false;
+    private bool shielded = false;
 
-    [SerializeField] private float _invulnerabilityDuration;
+    [SerializeField] private float invulnerabilityDuration;
 
-    private bool _isInvulnerable = false;
+    private bool isInvulnerable = false;
 
     private void Start()
     {
-        _currentLives = _maxLives;
-        _shielded = true;
+        currentLives = maxLives;
+        shielded = true;
         UpdateLifeUI();
     }
 
@@ -44,80 +44,80 @@ public class PlayerHP : MonoBehaviour
     {
         ScreenShaker.Instance.Shake(damage / 2f);
 
-        if (_isInvulnerable)
+        if (isInvulnerable)
             return;
 
-        if (_shielded)
+        if (shielded)
         {
-            _currentShield -= damage;
-            if (_currentShield <= 0)
+            currentShield -= damage;
+            if (currentShield <= 0)
             {
-                _shielded = false;
+                shielded = false;
                 StartCoroutine(Co_FlashAndFadeShield());
-                StartCoroutine(Co_InvulnerabilityTime(_shieldedInvulnerabilityDuration));
+                StartCoroutine(Co_InvulnerabilityTime(shieldedInvulnerabilityDuration));
                 StartCoroutine(Co_RegenShield());
             }
         }
         else
         {
-            _currentLives -= damage;
+            currentLives -= damage;
             UpdateLifeUI();
-            Debug.Log(_currentLives);
+            Debug.Log(currentLives);
 
-            if (_currentLives <= 0)
+            if (currentLives <= 0)
             {
                 Debug.Log("Game Over!");
-                Instantiate(_explosionPrefab, gameObject.transform.position, Quaternion.identity);
+                Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
                 Destroy(gameObject);
             }
             else
             {
-                StartCoroutine(Co_InvulnerabilityTime(_invulnerabilityDuration));
+                StartCoroutine(Co_InvulnerabilityTime(invulnerabilityDuration));
             }
         }
     }
 
     private void UpdateLifeUI()
     {
-        foreach (Transform child in _lifeIconContainer)
+        foreach (Transform child in lifeIconContainer)
         {
             Destroy(child.gameObject);
         }
 
-        for (int i = 0; i < _currentLives; i++)
+        for (int i = 0; i < currentLives; i++)
         {
-            GameObject lifeIcon = Instantiate(_lifeIconPrefab, _lifeIconContainer.transform);
-            lifeIcon.transform.localPosition = new Vector3(i * _livesUISpacingOffset - _livesUIHorizontalAdjustmentOffset, 0, 0);
+            GameObject lifeIcon = Instantiate(lifeIconPrefab, lifeIconContainer.transform);
+            lifeIcon.transform.localPosition = new Vector3(i * livesUISpacingOffset - livesUIHorizontalAdjustmentOffset, 0, 0);
         }
     }
 
 
     private IEnumerator Co_InvulnerabilityTime(float duration)
     {
-        _isInvulnerable = true;
+        isInvulnerable = true;
 
         yield return new WaitForSeconds(duration);
 
-        _isInvulnerable = false;
+        isInvulnerable = false;
     }
 
     private IEnumerator Co_FlashAndFadeShield()
     {
-        _shieldSprite.color = Color.white;
+        shieldSprite.color = Color.white;
         yield return new WaitForSeconds(0.1f);
 
-        yield return Co_ChangeSpriteColor(_shieldSprite, _fadeDuration, Color.white, Color.clear);
+        yield return Co_ChangeSpriteColor(shieldSprite, fadeDuration, Color.white, Color.clear);
     }
 
     private IEnumerator Co_RegenShield()
     {
-        yield return new WaitForSeconds(_shieldRegenDelay);
-        _currentShield = _maxShield;
-        _shielded = true;
+        yield return new WaitForSeconds(shieldRegenDelay);
+        currentShield = maxShield;
+        shielded = true;
 
-        yield return Co_ChangeSpriteColor(_shieldSprite, _flashDuration, Color.clear, Color.white);
+        yield return Co_ChangeSpriteColor(shieldSprite, flashDuration, Color.clear, Color.white);
 
-        yield return Co_ChangeSpriteColor(_shieldSprite, _fadeDuration, Color.white, Color.clear);
+        yield return Co_ChangeSpriteColor(shieldSprite, fadeDuration, Color.white, Color.clear);
     }
 
     private IEnumerator Co_ChangeSpriteColor(SpriteRenderer spriteRenderer, float duration, Color startColor, Color endColor)

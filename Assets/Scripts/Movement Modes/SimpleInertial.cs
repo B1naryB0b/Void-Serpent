@@ -9,7 +9,6 @@ public class SimpleInertial : MonoBehaviour
 
     public void UpdateMovement(Rigidbody2D rb, Vector2 currentThrust)
     {
-        // Assuming the vertical input is being used for thrust.
         if (Input.GetKey(KeyCode.W))
         {
             currentThrust.y += thrustIncreaseRate * Time.fixedDeltaTime;

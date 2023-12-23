@@ -26,16 +26,12 @@ public class Boid2D : MonoBehaviour
     public int numPerceivedFlockmates;
 
     // Cached
-    Material material;
     Transform cachedTransform;
     Transform target;
 
     void Awake()
     {
-        material = transform.GetComponentInChildren<SpriteRenderer>().material;
         cachedTransform = transform;
-        
-
     }
 
     public void Initialize(BoidSettings2D settings, Transform target)
@@ -50,13 +46,6 @@ public class Boid2D : MonoBehaviour
         velocity = transform.forward * startSpeed;
     }
 
-    public void SetColour(Color col)
-    {
-        if (material != null)
-        {
-            material.color = col;
-        }
-    }
 
 /*    private void Update()
     {

@@ -20,8 +20,8 @@ public class PolygonEditor : Editor
         serializedObject.Update();
 
         EditorGUILayout.IntSlider(sidesProperty, 3, 360, new GUIContent("Number of Sides"));
-        EditorGUILayout.Slider(radiusProperty, 0.5f, 10f, new GUIContent("Radius"));
-        EditorGUILayout.Slider(widthProperty, 0.1f, 1f, new GUIContent("Line Width"));
+        EditorGUILayout.Slider(radiusProperty, 0.5f, 100f, new GUIContent("Radius"));
+        EditorGUILayout.Slider(widthProperty, 0.1f, 3f, new GUIContent("Line Width"));
 
         serializedObject.ApplyModifiedProperties();
 

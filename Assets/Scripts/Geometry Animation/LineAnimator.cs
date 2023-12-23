@@ -54,7 +54,6 @@ public class LineAnimator : MonoBehaviour
 
             yield return new WaitForSeconds(Random.Range(0, randomDelay));
 
-            Debug.Log(pointsCount);
             for (int i = 0; i < pointsCount - 1; i++)
             {
                 float segmentDuration = animationDuration / (pointsCount - 1);

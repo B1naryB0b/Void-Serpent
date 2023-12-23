@@ -6,33 +6,30 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float _rotationSpeed;
-    [SerializeField] private float _brakeStrength;
-    [SerializeField] private float _brakeStoppingVelocity;
-    [SerializeField] private float _tiltClampAngle = 45f; // The maximum tilt angle along the Y-axis
+    [SerializeField] private float rotationSpeed;
+    [SerializeField] private float brakeStrength;
+    [SerializeField] private float brakeStoppingVelocity;
+    [SerializeField] private float tiltClampAngle = 45f; // The maximum tilt angle along the Y-axis
 
 
-    private Vector2 _currentThrust = Vector2.zero;
-    public Vector2 CurrentThrust => _currentThrust != null ? _currentThrust : Vector2.zero;
+    private Vector2 currentThrust = Vector2.zero;
+    public Vector2 CurrentThrust => currentThrust != null ? currentThrust : Vector2.zero;
 
-    private Rigidbody2D _playerRb;
+    private Rigidbody2D playerRb;
 
-    private SimpleInertial _inertialMovement;
-    private Linear _linearMovement;
-    private Tank _tankMovement;
+    private SimpleInertial inertialMovement;
+    private Linear linearMovement;
 
-    private Thrusters _thrusters;
+    private Thrusters thrusters;
 
     #region Movement Modes
-    private const int INERTIA_CODE = 0;
-    private const int LINEAR_CODE = 1;
-    private const int TANK_CODE = 2;
+    private const int INERTIACODE = 0;
+    private const int LINEARCODE = 1;
 
     public enum MovementMode
     {
         Inertia,
-        Linear,
-        Tank
+        Linear
     }
 
     private MovementMode movementMode;
@@ -40,13 +37,12 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        _inertialMovement = GetComponent<SimpleInertial>();
-        _linearMovement = GetComponent<Linear>();
-        _tankMovement = GetComponent<Tank>();
+        inertialMovement = GetComponent<SimpleInertial>();
+        linearMovement = GetComponent<Linear>();
 
-        _thrusters = GetComponent<Thrusters>();
+        thrusters = GetComponent<Thrusters>();
 
-        _playerRb = GetComponent<Rigidbody2D>();
+        playerRb = GetComponent<Rigidbody2D>();
 
         movementMode = MovementMode.Inertia;
     }
@@ -54,24 +50,19 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
-        RotateTowardsMouse();
-        ApplyTiltBasedOnAngleToMouse();
-        _thrusters.UpdateThrustTrail(_playerRb);
+        RotatePlayer();
+        thrusters.UpdateThrustTrail(playerRb);
     }
 
     private void MovePlayer()
     {
         if (movementMode == MovementMode.Inertia)
         {
-            _inertialMovement.UpdateMovement(_playerRb, _currentThrust);
+            inertialMovement.UpdateMovement(playerRb, currentThrust);
         }
         else if (movementMode == MovementMode.Linear)
         {
-            _linearMovement.UpdateMovement(_playerRb);
-        }
-        else if (movementMode == MovementMode.Tank)
-        {
-            _tankMovement.UpdateMovement(_playerRb, _currentThrust);
+            linearMovement.UpdateMovement(playerRb);
         }
         else
         {
@@ -80,67 +71,55 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftControl))
         {
-            Brake(_playerRb);
+            Brake(playerRb);
         }
     }
 
     private void Brake(Rigidbody2D rb)
     {
-        rb.velocity = Vector3.Lerp(rb.velocity, rb.velocity * 0.9f, _brakeStrength * Time.fixedDeltaTime);
-        if (rb.velocity.sqrMagnitude < _brakeStoppingVelocity)
+        rb.velocity = Vector3.Lerp(rb.velocity, rb.velocity * 0.9f, brakeStrength * Time.fixedDeltaTime);
+        if (rb.velocity.sqrMagnitude < brakeStoppingVelocity)
         {
             rb.velocity = Vector2.zero;
         }
-        _currentThrust = Vector2.zero;
+        currentThrust = Vector2.zero;
     }
 
-    private void RotateTowardsMouse()
+    private void RotatePlayer()
     {
-        if (movementMode != MovementMode.Tank)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Quaternion rotationTowardsMouse = GetRotationTowardsMouse();
+        Quaternion tiltRotation = GetTiltBasedOnAngleToMouse();
+        Quaternion totalTargetRotation = rotationTowardsMouse * tiltRotation;
 
-            float distanceToPlane;
-            Plane playerPlane = new Plane(-Vector3.forward, transform.position);
-            if (playerPlane.Raycast(ray, out distanceToPlane))
-            {
-                Vector3 pointOnPlane = ray.GetPoint(distanceToPlane);
-                Vector3 direction = pointOnPlane - transform.position;
-
-                direction.z = 0;
-
-                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-                Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.fixedDeltaTime);
-            }
-        }
-        else if (movementMode == MovementMode.Tank)
-        {
-            transform.Rotate(new Vector3(0, 0, Input.GetAxisRaw("Horizontal") * _rotationSpeed));
-        }
+        transform.rotation = Quaternion.Lerp(transform.rotation, totalTargetRotation, Time.fixedDeltaTime);
     }
 
-    private void ApplyTiltBasedOnAngleToMouse()
+    private Quaternion GetRotationTowardsMouse()
     {
-        if (movementMode != MovementMode.Tank)
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane playerPlane = new Plane(-Vector3.forward, transform.position);
+        if (playerPlane.Raycast(ray, out float distanceToPlane))
         {
-            Vector3 mousePosition = GetMousePositionOnPlayerPlane();
-            float signedAngle = CalculateSignedAngleToMouse(mousePosition);
-            float yTilt = Mathf.Clamp(signedAngle / 2, -_tiltClampAngle, _tiltClampAngle);
-            //Debug.Log(signedAngle);
+            Vector3 pointOnPlane = ray.GetPoint(distanceToPlane);
+            Vector3 direction = pointOnPlane - transform.position;
 
-            // Calculate the Z-axis rotation based on the current orientation of the GameObject
-            float zRotation = transform.eulerAngles.z;
+            direction.z = 0;
 
-            // Create a Quaternion for the Y-axis tilt
-            Quaternion yTiltRotation = Quaternion.Euler(0, yTilt, 0);
+            Debug.DrawLine(transform.position, direction);
 
-            // Combine the current Z-axis rotation with the new Y-axis tilt
-            Quaternion totalRotation = yTiltRotation * Quaternion.Euler(0, 0, zRotation);
-
-            // Apply the combined rotation to the Transform
-            transform.rotation = totalRotation;
+            return Quaternion.LookRotation(Vector3.forward, direction);
         }
+        return transform.rotation;
+    }
+
+    private Quaternion GetTiltBasedOnAngleToMouse()
+    {
+        Vector3 mousePosition = GetMousePositionOnPlayerPlane();
+        float signedAngle = CalculateSignedAngleToMouse(mousePosition);
+        float yTilt = Mathf.Clamp(signedAngle / 2, -tiltClampAngle, tiltClampAngle);
+
+        // Since we're in 2D, we rotate around the Z-axis to simulate tilt
+        return Quaternion.AngleAxis(yTilt, Vector3.up);
     }
 
     private Vector3 GetMousePositionOnPlayerPlane()
@@ -163,13 +142,10 @@ public class PlayerController : MonoBehaviour
     {
         switch (modeCode)
         {
-            case LINEAR_CODE:
+            case LINEARCODE:
                 movementMode = MovementMode.Linear;
                 break;
-            case TANK_CODE:
-                movementMode = MovementMode.Tank;
-                break;
-            case INERTIA_CODE:
+            case INERTIACODE:
             default:
                 movementMode = MovementMode.Inertia;
                 break;

@@ -15,8 +15,8 @@ public class Inertial : MonoBehaviour
 
     public void UpdateMovement(Rigidbody2D rb, Vector2 currentThrust)
     {
-        currentThrust.y = AdjustThrust(currentThrust.y, KeyCode.W, KeyCode.S, canChangeVerticalDirection, VerticalDirectionChangeDelay);
-        currentThrust.x = AdjustThrust(currentThrust.x, KeyCode.D, KeyCode.A, canChangeHorizontalDirection, HorizontalDirectionChangeDelay);
+        currentThrust.y = AdjustThrust(currentThrust.y, KeyCode.W, KeyCode.S, canChangeVerticalDirection, Co_VerticalDirectionChangeDelay);
+        currentThrust.x = AdjustThrust(currentThrust.x, KeyCode.D, KeyCode.A, canChangeHorizontalDirection, Co_HorizontalDirectionChangeDelay);
 
         // Apply force based on thrust values
         rb.AddForce(transform.up * currentThrust.y + transform.right * currentThrust.x);
@@ -66,14 +66,14 @@ public class Inertial : MonoBehaviour
         return current;
     }
 
-    private IEnumerator VerticalDirectionChangeDelay()
+    private IEnumerator Co_VerticalDirectionChangeDelay()
     {
         canChangeVerticalDirection = false;
         yield return new WaitForSeconds(0.3f);
         canChangeVerticalDirection = true;
     }
 
-    private IEnumerator HorizontalDirectionChangeDelay()
+    private IEnumerator Co_HorizontalDirectionChangeDelay()
     {
         canChangeHorizontalDirection = false;
         yield return new WaitForSeconds(0.3f);

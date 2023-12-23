@@ -52,8 +52,6 @@ public class Spawner2D : MonoBehaviour
             // Set the boid's direction to the specified start direction
             boid.transform.up = new Vector3(startDirection.x, startDirection.y, 0);
 
-            boid.SetColour(colour);
-
             // This is crucial. You must initialize each boid with the proper settings.
             Transform target = boid.transform;
 

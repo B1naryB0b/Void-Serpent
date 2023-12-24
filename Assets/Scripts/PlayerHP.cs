@@ -4,38 +4,25 @@ using UnityEngine;
 
 public class PlayerHP : MonoBehaviour
 {
+    [SerializeField] private DataBank dataBank;
+    private PlayerData playerData;
+    private UIData uiData;
 
-    [SerializeField] private int maxLives;
+    [SerializeField] private SpriteRenderer shieldSprite;
+    [SerializeField] private Transform lifeIconContainer;
+
 
     private int currentLives;
-
-    [SerializeField] private GameObject lifeIconPrefab;
-    [SerializeField] private Transform lifeIconContainer;
-    [SerializeField] private float livesUISpacingOffset;
-    [SerializeField] private float livesUIHorizontalAdjustmentOffset;
-
-
-    [SerializeField] private int maxShield;
-
     private int currentShield;
 
-    [SerializeField] private GameObject explosionPrefab;
-
-    [SerializeField] private float shieldedInvulnerabilityDuration;
-    [SerializeField] private float shieldRegenDelay;
-    [SerializeField] private float flashDuration;
-    [SerializeField] private float fadeDuration;
-    [SerializeField] private SpriteRenderer shieldSprite;
-
     private bool shielded = false;
-
-    [SerializeField] private float invulnerabilityDuration;
-
     private bool isInvulnerable = false;
 
     private void Start()
     {
-        currentLives = maxLives;
+        playerData = dataBank.playerData;
+        uiData = dataBank.uiData;
+        currentLives = playerData.maxLives;
         shielded = true;
         UpdateLifeUI();
     }
@@ -54,7 +41,7 @@ public class PlayerHP : MonoBehaviour
             {
                 shielded = false;
                 StartCoroutine(Co_FlashAndFadeShield());
-                StartCoroutine(Co_InvulnerabilityTime(shieldedInvulnerabilityDuration));
+                StartCoroutine(Co_InvulnerabilityTime(playerData.shieldedInvulnerabilityDuration));
                 StartCoroutine(Co_RegenShield());
             }
         }
@@ -67,12 +54,12 @@ public class PlayerHP : MonoBehaviour
             if (currentLives <= 0)
             {
                 Debug.Log("Game Over!");
-                Instantiate(explosionPrefab, gameObject.transform.position, Quaternion.identity);
+                Instantiate(playerData.explosionPrefab, gameObject.transform.position, Quaternion.identity);
                 Destroy(gameObject);
             }
             else
             {
-                StartCoroutine(Co_InvulnerabilityTime(invulnerabilityDuration));
+                StartCoroutine(Co_InvulnerabilityTime(playerData.invulnerabilityDuration));
             }
         }
     }
@@ -86,8 +73,8 @@ public class PlayerHP : MonoBehaviour
 
         for (int i = 0; i < currentLives; i++)
         {
-            GameObject lifeIcon = Instantiate(lifeIconPrefab, lifeIconContainer.transform);
-            lifeIcon.transform.localPosition = new Vector3(i * livesUISpacingOffset - livesUIHorizontalAdjustmentOffset, 0, 0);
+            GameObject lifeIcon = Instantiate(uiData.lifeIconPrefab, lifeIconContainer.transform);
+            lifeIcon.transform.localPosition = new Vector3(i * uiData.livesUISpacingOffset - uiData.livesUIHorizontalAdjustmentOffset, 0, 0);
         }
     }
 
@@ -106,18 +93,18 @@ public class PlayerHP : MonoBehaviour
         shieldSprite.color = Color.white;
         yield return new WaitForSeconds(0.1f);
 
-        yield return Co_ChangeSpriteColor(shieldSprite, fadeDuration, Color.white, Color.clear);
+        yield return Co_ChangeSpriteColor(shieldSprite, playerData.fadeDuration, Color.white, Color.clear);
     }
 
     private IEnumerator Co_RegenShield()
     {
-        yield return new WaitForSeconds(shieldRegenDelay);
-        currentShield = maxShield;
+        yield return new WaitForSeconds(playerData.shieldRegenDelay);
+        currentShield = playerData.maxShield;
         shielded = true;
 
-        yield return Co_ChangeSpriteColor(shieldSprite, flashDuration, Color.clear, Color.white);
+        yield return Co_ChangeSpriteColor(shieldSprite, playerData.flashDuration, Color.clear, Color.white);
 
-        yield return Co_ChangeSpriteColor(shieldSprite, fadeDuration, Color.white, Color.clear);
+        yield return Co_ChangeSpriteColor(shieldSprite, playerData.fadeDuration, Color.white, Color.clear);
     }
 
     private IEnumerator Co_ChangeSpriteColor(SpriteRenderer spriteRenderer, float duration, Color startColor, Color endColor)

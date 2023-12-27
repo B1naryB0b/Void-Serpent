@@ -8,9 +8,9 @@ public class LineFollowTarget : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private Transform anchor;
 
-    [Range(0f, 20f)]
+    [Range(0f, 50f)]
     [SerializeField] private float distanceFromTarget;
-    [Range(0f, 20f)]
+    [Range(0f, 50f)]
     [SerializeField] private float distanceFromAnchor;
 
     [Range(0f, 100f)]

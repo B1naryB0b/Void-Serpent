@@ -66,18 +66,18 @@ public class PlayerController : MonoBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Plane playerPlane = new Plane(-Vector3.forward, transform.position);
-        if (playerPlane.Raycast(ray, out float distanceToPlane))
-        {
-            Vector3 pointOnPlane = ray.GetPoint(distanceToPlane);
-            Vector3 direction = pointOnPlane - transform.position;
 
-            direction.z = 0;
+        playerPlane.Raycast(ray, out float distanceToPlane);
+      
+        Vector3 pointOnPlane = ray.GetPoint(distanceToPlane);
+        Vector3 direction = pointOnPlane - transform.position;
 
-            Debug.DrawLine(transform.position, direction);
+        direction.z = 0;
 
-            return Quaternion.LookRotation(Vector3.forward, direction);
-        }
-        return transform.rotation;
+        Debug.DrawLine(transform.position, direction);
+
+        return Quaternion.LookRotation(Vector3.forward, direction);
+
     }
 
     private Quaternion GetTiltBasedOnAngleToMouse()

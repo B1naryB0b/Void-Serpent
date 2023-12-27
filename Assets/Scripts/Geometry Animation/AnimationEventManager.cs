@@ -8,29 +8,31 @@ public class AnimationEventManager : MonoBehaviour
     {
         foreach (var animationElement in animationElements)
         {
-            if (animationElement is ColorAnimationElement colorElement)
+            switch (animationElement)
             {
-                HandleColorAnimationElement(colorElement, triggeredObject);
-            }
-            else if (animationElement is TransformAnimationElement transformElement)
-            {
-                HandleTransformAnimationElement(transformElement, triggeredObject);
-            }
-            else if (animationElement is DisplaceAnimationElement displaceElement)
-            {
-                HandleDisplaceAnimationElement(displaceElement, triggeredObject);
-            }
-            else if (animationElement is TraceAnimationElement traceElement)
-            {
-                HandleTraceAnimationElement(traceElement, triggeredObject);
-            }
-            else if (animationElement is DrawAnimationElement drawElement)
-            {
-                HandleDrawAnimationElement(drawElement, triggeredObject);
-            }
-            else
-            {
-                Debug.LogWarning("No animation element type selected.");
+                case ColorAnimationElement colorElement:
+                    HandleColorAnimationElement(colorElement, triggeredObject);
+                    break;
+
+                case TransformAnimationElement transformElement:
+                    HandleTransformAnimationElement(transformElement, triggeredObject);
+                    break;
+
+                case DisplaceAnimationElement displaceElement:
+                    HandleDisplaceAnimationElement(displaceElement, triggeredObject);
+                    break;
+
+                case TraceAnimationElement traceElement:
+                    HandleTraceAnimationElement(traceElement, triggeredObject);
+                    break;
+
+                case DrawAnimationElement drawElement:
+                    HandleDrawAnimationElement(drawElement, triggeredObject);
+                    break;
+
+                default:
+                    Debug.LogWarning("No animation element type selected.");
+                    break;
             }
         }
     }
@@ -46,28 +48,30 @@ public class AnimationEventManager : MonoBehaviour
         {
             Debug.LogWarning("SpriteRenderer not found on the object.");
         }
+        
+        IEnumerator AnimateColor(SpriteRenderer spriteRenderer, ColorAnimationElement element)
+        {
+            float elapsed = 0f;
+
+            while (elapsed < element.animationDuration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = element.curve.Evaluate(elapsed / element.animationDuration);
+                Debug.Log(progress);
+                spriteRenderer.color = Color.Lerp(element.startColor, element.endColor, progress);
+                yield return null;
+            }
+
+            // Ensure the color is set to the end color at the end of the animation
+            spriteRenderer.color = element.endColor;
+
+            if (element.isLooped)
+            {
+                StartCoroutine(AnimateColor(spriteRenderer, element)); // Restart the animation if looped
+            }
+        }
     }
 
-    private IEnumerator AnimateColor(SpriteRenderer spriteRenderer, ColorAnimationElement element)
-    {
-        float elapsed = 0f;
-
-        while (elapsed < element.animationDuration)
-        {
-            elapsed += Time.deltaTime;
-            float progress = element.curve.Evaluate(elapsed / element.animationDuration);
-            spriteRenderer.color = Color.Lerp(element.startColor, element.endColor, progress);
-            yield return null;
-        }
-
-        // Ensure the color is set to the end color at the end of the animation
-        spriteRenderer.color = element.endColor;
-
-        if (element.isLooped)
-        {
-            StartCoroutine(AnimateColor(spriteRenderer, element)); // Restart the animation if looped
-        }
-    }
 
 
     private void HandleTransformAnimationElement(TransformAnimationElement element, GameObject obj)

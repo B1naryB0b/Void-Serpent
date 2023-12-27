@@ -15,6 +15,7 @@ public enum ElementType
 [System.Serializable]
 public abstract class AnimationElement
 {
+    public float animationOrder;
     public bool isLooped;
     public float animationDuration;
     public AnimationCurve curve;

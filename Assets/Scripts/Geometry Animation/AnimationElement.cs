@@ -13,6 +13,24 @@ public enum ElementType
 }
 
 [System.Serializable]
+public struct TransformComponent
+{
+    public Vector3 position;
+    public Quaternion rotation;
+    public Vector3 localScale;
+
+    public TransformComponent(Vector3 position = default, Quaternion rotation = default, Vector3 localScale = default)
+    {
+        this.position = position == default ? Vector3.zero : position;
+        this.rotation = rotation == default ? Quaternion.identity : rotation;
+        this.localScale = localScale == default ? Vector3.one : localScale;
+    }
+}
+
+
+
+
+[System.Serializable]
 public abstract class AnimationElement
 {
     public float animationOrder;
@@ -34,8 +52,8 @@ public class ColorAnimationElement : AnimationElement
 public class TransformAnimationElement : AnimationElement
 {
     public ElementType type => ElementType.Transform;
-    public Transform startTransform;
-    public Transform endTransform;
+    public TransformComponent startTransform;
+    public TransformComponent endTransform;
 }
 
 [System.Serializable]

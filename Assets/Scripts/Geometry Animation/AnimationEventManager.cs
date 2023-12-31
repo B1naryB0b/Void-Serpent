@@ -72,12 +72,68 @@ public class AnimationEventManager : MonoBehaviour
         }
     }
 
-
-
     private void HandleTransformAnimationElement(TransformAnimationElement element, GameObject obj)
     {
-        // Implementation for Transform Animation Element
+        StartCoroutine(AnimateTransform(element, obj));
     }
+
+    IEnumerator AnimateTransform(TransformAnimationElement element, GameObject obj)
+    {
+        float elapsed = 0f;
+        Transform originalObjTransform = obj.transform;
+
+        // Save the original state
+        Vector3 originalPosition = originalObjTransform.position;
+        Quaternion originalRotation = originalObjTransform.rotation;
+        Vector3 originalScale = originalObjTransform.localScale;
+
+        while (elapsed < element.animationDuration)
+        {
+            elapsed += Time.deltaTime;
+            float progress = element.curve.Evaluate(elapsed / element.animationDuration);
+
+            // Position
+            Vector3 startPosition = originalPosition + element.startTransform.position;
+            Vector3 endPosition = originalPosition + element.endTransform.position;
+            obj.transform.position = Vector3.Lerp(startPosition, endPosition, progress);
+
+            // Rotation
+            Vector3 startRotation = originalRotation.eulerAngles + element.startTransform.rotation.eulerAngles;
+            Vector3 endRotation = originalRotation.eulerAngles + element.endTransform.rotation.eulerAngles;
+            obj.transform.rotation = Quaternion.Lerp(Quaternion.Euler(startRotation), Quaternion.Euler(endRotation), progress);
+
+            // Scale
+            Vector3 startScale = new Vector3(
+                    originalScale.x * element.startTransform.localScale.x,
+                    originalScale.y * element.startTransform.localScale.y,
+                    originalScale.z * element.startTransform.localScale.z
+                );
+
+            Vector3 endScale = new Vector3(
+                    originalScale.x * element.endTransform.localScale.x,
+                    originalScale.y * element.endTransform.localScale.y,
+                    originalScale.z * element.endTransform.localScale.z
+                );
+
+            obj.transform.localScale = Vector3.Lerp(startScale, endScale, progress);
+
+            yield return null;
+        }
+
+        // Reset to original state if not looped
+        if (!element.isLooped)
+        {
+            obj.transform.position = originalPosition;
+            //obj.transform.rotation = originalRotation;
+            obj.transform.localScale = originalScale;
+        }
+        else
+        {
+            StartCoroutine(AnimateTransform(element, obj)); // Restart the animation if looped
+        }
+    }
+
+
 
     private void HandleDisplaceAnimationElement(DisplaceAnimationElement element, GameObject obj)
     {

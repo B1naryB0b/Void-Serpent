@@ -6,9 +6,9 @@ public class SimpleDestroy : MonoBehaviour
 {
     [SerializeField] private float _delay;
 
-    private void Start()
+    private void Awake()
     {
-        Co_DelayedDestroy();
+        StartCoroutine(Co_DelayedDestroy());
     }
 
     private IEnumerator Co_DelayedDestroy()

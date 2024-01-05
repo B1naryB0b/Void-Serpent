@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42089e7c84bd826419071537ab7a5c58, type: 3}
   m_Name: Boid Settings 2D
   m_EditorClassIdentifier: 
-  minSpeed: 10
+  minSpeed: 0
   maxSpeed: 12
   perceptionRadius: 5
   avoidanceRadius: 5
   maxSteerForce: 0.5
-  alignWeight: 20
-  cohesionWeight: 30
+  alignWeight: 40
+  cohesionWeight: 20
   separateWeight: 90
-  targetWeight: 15
+  targetWeight: 30
   obstacleMask:
     serializedVersion: 2
     m_Bits: 24576

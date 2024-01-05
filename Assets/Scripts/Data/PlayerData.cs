@@ -9,6 +9,10 @@ public class PlayerData : ScriptableObject
 
 
     [Header("Rotation")]
+
+    public float pointToMouseRotationSpeed;
+    public float tiltRotationSpeed;
+
     [Range(0f, 90f)]
     public float tiltClampAngle;
 

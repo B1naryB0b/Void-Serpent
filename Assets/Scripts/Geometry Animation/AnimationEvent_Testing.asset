@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d835eccfcfef19b47804c1823be03027, type: 3}
   m_Name: AnimationEvent_Testing
   m_EditorClassIdentifier: 
-  colorAnimationElements: []
-  transformAnimationElements:
+  colorAnimationElements:
   - animationOrder: 0
-    isLooped: 1
-    animationDuration: 5
+    isLooped: 0
+    animationDuration: 2
     curve:
       serializedVersion: 2
       m_Curve:
@@ -41,14 +40,9 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    startTransform:
-      position: {x: 0, y: 0, z: 0}
-      rotation: {x: 0, y: 0, z: 0, w: 0}
-      localScale: {x: 1, y: 1, z: 1}
-    endTransform:
-      position: {x: 5, y: 0, z: 0}
-      rotation: {x: 0, y: 0, z: 0, w: 0}
-      localScale: {x: 1, y: 1, z: 1}
+    startColor: {r: 1, g: 1, b: 1, a: 1}
+    endColor: {r: 0.4811321, g: 0, b: 0, a: 0.078431375}
+  transformAnimationElements: []
   displaceAnimationElements: []
   traceAnimationElements: []
   drawAnimationElements: []

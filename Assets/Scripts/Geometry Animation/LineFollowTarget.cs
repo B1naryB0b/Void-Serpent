@@ -8,7 +8,6 @@ public class LineFollowTarget : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private Transform anchor;
 
-    [Range(0f, 50f)]
     [SerializeField] private float distanceFromTarget;
     [Range(0f, 50f)]
     [SerializeField] private float distanceFromAnchor;
@@ -28,17 +27,57 @@ public class LineFollowTarget : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 displacement = target.position - anchor.position;
+        float angleFromAnchorToTarget = CalculateSignedAngle(anchor, target);
+        float angleFromTargetToAnchor = CalculateSignedAngle(target, anchor);
+
+        Vector3 anchorRingPoint = PolarCoordinateToWorldSpace(anchor, angleFromAnchorToTarget, distanceFromAnchor);
+        Vector3 targetRingPoint = PolarCoordinateToWorldSpace(target, angleFromTargetToAnchor, distanceFromTarget);
+
+        Debug.DrawLine(anchor.position, anchorRingPoint, Color.red);
+        Debug.DrawLine(target.position, targetRingPoint, Color.blue);
+
+        Vector3 displacement = anchorRingPoint - targetRingPoint;
         Vector3 normalDisplacement = displacement.normalized;
 
-        lineRenderer.SetPosition(0, target.position + (normalDisplacement * -distanceFromTarget));
-        lineRenderer.SetPosition(1, anchor.position + (normalDisplacement * distanceFromAnchor));
+        lineRenderer.SetPosition(0, targetRingPoint);
+        lineRenderer.SetPosition(1, anchorRingPoint);
 
-        Color currentColor = new Color(255, 255, 255, Mathf.Clamp01(displacement.magnitude - (distanceFromAnchor + distanceFromTarget)));
+
+        float distance = displacement.magnitude;
+        float alpha = Mathf.InverseLerp(outOfRangeDistance + outOfRangeFadeDistance, outOfRangeDistance, distance);
+        Color currentColor = new Color(1, 1, 1, alpha);
 
         lineRenderer.startColor = currentColor; 
         lineRenderer.endColor = currentColor;
 
 
     }
+
+    private float CalculateSignedAngle(Transform anchor, Transform target)
+    {
+        Vector3 directionToTarget = (target.position - anchor.position).normalized;
+        Vector3 objectUp = transform.up;
+        float signedAngle = Vector3.SignedAngle(objectUp, directionToTarget, Vector3.forward);
+
+        // Adjust the angle by 90 degrees
+        signedAngle += 90.0f;
+
+        return signedAngle;
+    }
+
+
+    private Vector3 PolarCoordinateToWorldSpace(Transform origin, float angle, float distance)
+    {
+        float angleInRadians = angle * Mathf.Deg2Rad;
+        Vector3 newVector = new Vector3(
+            origin.position.x + distance * Mathf.Cos(angleInRadians),
+            origin.position.y + distance * Mathf.Sin(angleInRadians),
+            origin.position.z
+        );
+
+        return newVector;
+    }
+
+
+
 }

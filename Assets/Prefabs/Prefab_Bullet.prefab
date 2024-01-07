@@ -98,10 +98,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df29e0ddcfd8a054894a787b5cd6be72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 100
+  speed: 150
   damage: 1
   lifeTime: 6
-  lifeTimeMultiplier: 0.2
+  lifeTimeMultiplier: 0.1
   hitEnemySound: {fileID: 8300000, guid: aca9776cea8dcd546a0d07b9e085de76, type: 3}
   hitPlayerSound: {fileID: 8300000, guid: 4a68141ec95e9684baff456529592605, type: 3}
   speedCurve:
@@ -109,21 +109,30 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1.0000007
-      inSlope: -1.0501848
-      outSlope: -1.0501848
+      value: 0.8997773
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.16255605
+      outWeight: 0.55
     - serializedVersion: 3
-      time: 1
-      value: 0.5
-      inSlope: -0.08459797
-      outSlope: -0.08459797
+      time: 0.5
+      value: 1.0007637
+      inSlope: 0.0025045932
+      outSlope: 0.0025045932
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.26008964
+      inWeight: 0.33333334
+      outWeight: 0.30090055
+    - serializedVersion: 3
+      time: 1.0125
+      value: 0.48775184
+      inSlope: 0.58367246
+      outSlope: 0.58367246
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.38666663
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

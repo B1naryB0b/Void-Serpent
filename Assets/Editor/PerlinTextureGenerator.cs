@@ -1,6 +1,5 @@
 using UnityEditor;
 using UnityEngine;
-using static TreeEditor.TextureAtlas;
 
 [CustomEditor(typeof(PerlinTextureSettings))]
 public class PerlinTextureGenerator : Editor

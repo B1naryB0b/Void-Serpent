@@ -21,4 +21,5 @@ MonoBehaviour:
   - {x: 0.2, y: -0.1, z: 0}
   - {x: -0.2, y: -0.1, z: 0}
   playerShootRate: 5
+  recoil: 10
   shootSound: {fileID: 8300000, guid: e56e0958037e2264293f0fd7aac5d0fd, type: 3}

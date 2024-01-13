@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda69d2c8658ddc498d75ccba5106ece, type: 3}
   m_Name: PlayerData_Testing
   m_EditorClassIdentifier: 
-  pointToMouseRotationSpeed: 3
-  tiltRotationSpeed: 1
+  pointToMouseRotationSpeed: 4
+  tiltRotationSpeed: 2
   tiltClampAngle: 45
   brakeStrength: 10
   brakeStoppingVelocity: 0.5

@@ -12,6 +12,12 @@ public class Shooter : MonoBehaviour
 
     private float nextShootTime = 0.0f;
 
+    private Rigidbody2D rigidbody2D;
+
+    private void Start()
+    {
+        rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
+    }
 
     private void Update()
     {
@@ -24,6 +30,9 @@ public class Shooter : MonoBehaviour
         if (Input.GetKey(KeyCode.Mouse0) && Time.time > nextShootTime)
         {
             Weapon weapon = weaponManager.equippedWeapon;
+
+            ScreenShaker.Instance.Shake(1f / weapon.playerShootRate);
+            rigidbody2D.AddForce(-transform.up * weapon.recoil);
             weapon.Shoot(rampingController.CurrentRampingTier, gameObject.transform);
             nextShootTime = Time.time + (1f / weapon.playerShootRate);
         }

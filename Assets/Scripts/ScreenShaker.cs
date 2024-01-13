@@ -17,6 +17,8 @@ public class ScreenShaker : MonoBehaviour
     [SerializeField] private float _shakeSpeed;
     [SerializeField] private float _shakeIntensity;
 
+    public float traumaDecaySpeed = 1f;
+
     public static ScreenShaker Instance { get; private set; }
 
     private void Awake()
@@ -71,7 +73,7 @@ public class ScreenShaker : MonoBehaviour
 
     private void DecayTrauma()
     {
-        _currentTrauma -= Time.deltaTime;
+        _currentTrauma -= traumaDecaySpeed * Time.deltaTime;
         _currentTrauma = Mathf.Clamp01(_currentTrauma);
     }
 
@@ -79,10 +81,10 @@ public class ScreenShaker : MonoBehaviour
     {
         float shakeMagnitude = _currentTrauma * _currentTrauma;
 
-        float xOffset = _maxTranslationalShake * shakeMagnitude * (GetPerlinNoise(100, Time.time * _shakeSpeed));
-        float yOffset = _maxTranslationalShake * shakeMagnitude * (GetPerlinNoise(200, Time.time * _shakeSpeed));
+        float xOffset = _maxTranslationalShake * shakeMagnitude * (GetPerlinNoise(Random.Range(0, 100), Time.time * _shakeSpeed));
+        float yOffset = _maxTranslationalShake * shakeMagnitude * (GetPerlinNoise(Random.Range(100, 200), Time.time * _shakeSpeed));
 
-        float rotationalOffset = _maxRotationalShake * shakeMagnitude * (GetPerlinNoise(300, Time.time * _shakeSpeed));
+        float rotationalOffset = _maxRotationalShake * shakeMagnitude * (GetPerlinNoise(Random.Range(200, 300), Time.time * _shakeSpeed));
 
         Vector3 newPos = new Vector3(_cameraTransform.position.x + xOffset, _cameraTransform.position.y + yOffset, _cameraTransform.position.z);
 

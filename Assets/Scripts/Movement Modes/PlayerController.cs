@@ -51,6 +51,16 @@ public class PlayerController : MonoBehaviour
         {
             Brake(playerRb);
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            Boost(playerRb);
+        }
+    }
+
+    private void Boost(Rigidbody2D rb)
+    {
+        rb.velocity = transform.up * inertialMovement.terminalVelocity;
     }
 
     private void Brake(Rigidbody2D rb)

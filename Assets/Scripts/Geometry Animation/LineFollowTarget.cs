@@ -34,7 +34,7 @@ public class LineFollowTarget : MonoBehaviour
 
         if (debugMode)
         {
-            Debug.Log(angleFromTargetToAnchor);
+            //Debug.Log(angleFromTargetToAnchor);
         }
 
         Vector3 anchorRingPoint = PolarCoordinateToWorldSpace(anchor, angleFromAnchorToTarget, distanceFromAnchor);

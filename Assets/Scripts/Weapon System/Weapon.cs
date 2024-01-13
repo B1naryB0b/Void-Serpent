@@ -11,6 +11,8 @@ public class Weapon : ScriptableObject
 
     public float playerShootRate;
 
+    public float recoil;
+
     public AudioClip shootSound;
 
     public void Shoot(int rampingTier, Transform playerTransform)

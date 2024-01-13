@@ -7,9 +7,18 @@ public class SimpleInertial : MonoBehaviour
     [SerializeField] private float thrustDecreaseRate = 20.0f;
     [SerializeField] private float terminalVelocity = 12.0f;
 
+    private float thrustInput = 0.0f;
+
+    private void Update()
+    {
+        // Capture the input in Update
+        thrustInput = Input.GetKey(KeyCode.W) ? 1.0f : 0.0f;
+    }
+
     public void UpdateMovement(Rigidbody2D rb, Vector2 currentThrust)
     {
-        if (Input.GetKey(KeyCode.W))
+        // Apply the input in FixedUpdate
+        if (thrustInput > 0)
         {
             currentThrust.y += thrustIncreaseRate * Time.fixedDeltaTime;
         }

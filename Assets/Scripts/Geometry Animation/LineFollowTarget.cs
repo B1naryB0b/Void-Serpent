@@ -5,6 +5,8 @@ using UnityEngine;
 public class LineFollowTarget : MonoBehaviour
 {
 
+    [SerializeField] private bool debugMode;
+
     [SerializeField] private Transform target;
     [SerializeField] private Transform anchor;
 
@@ -30,10 +32,15 @@ public class LineFollowTarget : MonoBehaviour
         float angleFromAnchorToTarget = CalculateSignedAngle(anchor, target);
         float angleFromTargetToAnchor = CalculateSignedAngle(target, anchor);
 
+        if (debugMode)
+        {
+            Debug.Log(angleFromTargetToAnchor);
+        }
+
         Vector3 anchorRingPoint = PolarCoordinateToWorldSpace(anchor, angleFromAnchorToTarget, distanceFromAnchor);
         Vector3 targetRingPoint = PolarCoordinateToWorldSpace(target, angleFromTargetToAnchor, distanceFromTarget);
 
-        Debug.DrawLine(anchor.position, anchorRingPoint, Color.red);
+        //Debug.DrawLine(anchor.position, anchorRingPoint, Color.red);
         Debug.DrawLine(target.position, targetRingPoint, Color.blue);
 
         Vector3 displacement = anchorRingPoint - targetRingPoint;
@@ -55,15 +62,17 @@ public class LineFollowTarget : MonoBehaviour
 
     private float CalculateSignedAngle(Transform anchor, Transform target)
     {
-        Vector3 directionToTarget = (target.position - anchor.position).normalized;
-        Vector3 objectUp = transform.up;
-        float signedAngle = Vector3.SignedAngle(objectUp, directionToTarget, Vector3.forward);
+        Vector3 toTarget = target.position - anchor.position;
+        Vector3 toTargetOnPlane = Vector3.ProjectOnPlane(toTarget, Vector3.forward);
 
-        // Adjust the angle by 90 degrees
-        signedAngle += 90.0f;
+        float angle = Vector3.Angle(Vector3.right, toTargetOnPlane);
+        float sign = Mathf.Sign(Vector3.Dot(Vector3.forward, Vector3.Cross(Vector3.right, toTargetOnPlane)));
+
+        float signedAngle = angle * sign;
 
         return signedAngle;
     }
+
 
 
     private Vector3 PolarCoordinateToWorldSpace(Transform origin, float angle, float distance)

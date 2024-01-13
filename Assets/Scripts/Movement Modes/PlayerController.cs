@@ -20,12 +20,16 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D playerRb;
     private SimpleInertial inertialMovement;
 
+    private Camera mainCamera;
+
     private void Start()
     {
         playerData = dataBank.playerData;
         inertialMovement = GetComponent<SimpleInertial>();
 
         playerRb = GetComponent<Rigidbody2D>();
+
+        mainCamera = Camera.main;
     }
 
     private void FixedUpdate()
@@ -65,17 +69,17 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, rotationTowardsMouse, Time.deltaTime * playerData.pointToMouseRotationSpeed);
 
         Vector3 tiltRotation = GetTiltBasedOnAngleToMouse();
-        Debug.Log(tiltRotation);
+        //Debug.Log(tiltRotation);
         Vector3 currentMeshRotationEuler = playerMeshObject.transform.localEulerAngles;
         float lerpedYTilt = CustomLerpAngle(currentMeshRotationEuler.y, tiltRotation.y, Time.deltaTime * playerData.tiltRotationSpeed);
-        //lerpedYTilt = Mathf.Clamp(lerpedYTilt, -playerData.tiltClampAngle, playerData.tiltClampAngle);
+
         playerMeshObject.transform.localEulerAngles = new Vector3(0, lerpedYTilt, 0);
 
     }
 
     private Quaternion GetRotationTowardsMouse()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         Plane playerPlane = new Plane(-Vector3.forward, transform.position);
 
         playerPlane.Raycast(ray, out float distanceToPlane);
@@ -96,14 +100,14 @@ public class PlayerController : MonoBehaviour
         Vector3 mousePosition = GetMousePositionOnPlayerPlane();
         float signedAngle = CalculateSignedAngleToMouse(mousePosition);
         float yTilt = Mathf.Clamp(signedAngle, -playerData.tiltClampAngle, playerData.tiltClampAngle);
-        Debug.Log(signedAngle);
+        //Debug.Log(signedAngle);
 
         return new Vector3(0, yTilt, 0);
     }
 
     private Vector3 GetMousePositionOnPlayerPlane()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         Plane playerPlane = new Plane(-Vector3.forward, transform.position);
         playerPlane.Raycast(ray, out float distanceToPlane);
         return ray.GetPoint(distanceToPlane);

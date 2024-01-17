@@ -60,6 +60,11 @@ public class ScreenShaker : MonoBehaviour
         }
     }
 
+    public float GetCurrentTrauma()
+    {
+        return _currentTrauma;
+    }
+
     public void Shake(float traumaLevel)
     {
         ApplyTrauma(traumaLevel);

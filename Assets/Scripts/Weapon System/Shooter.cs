@@ -12,11 +12,11 @@ public class Shooter : MonoBehaviour
 
     private float nextShootTime = 0.0f;
 
-    private Rigidbody2D rigidbody2D;
+    private Rigidbody2D rb;
 
     private void Start()
     {
-        rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
+        rb = gameObject.GetComponent<Rigidbody2D>();
     }
 
     private void Update()
@@ -30,9 +30,14 @@ public class Shooter : MonoBehaviour
         if (Input.GetKey(KeyCode.Mouse0) && Time.time > nextShootTime)
         {
             Weapon weapon = weaponManager.equippedWeapon;
+            float shotShake = (1f / weapon.playerShootRate) * Mathf.Pow(1.05f, rampingController.CurrentRampingTier);
 
-            ScreenShaker.Instance.Shake(1f / weapon.playerShootRate);
-            rigidbody2D.AddForce(-transform.up * weapon.recoil);
+            if(ScreenShaker.Instance.GetCurrentTrauma() < 0.2f)
+            {
+                ScreenShaker.Instance.Shake(shotShake);  
+            }
+
+            rb.AddForce(-transform.up * weapon.recoil);
             weapon.Shoot(rampingController.CurrentRampingTier, gameObject.transform);
             nextShootTime = Time.time + (1f / weapon.playerShootRate);
         }

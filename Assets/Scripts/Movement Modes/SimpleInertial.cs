@@ -6,6 +6,8 @@ public class SimpleInertial : MonoBehaviour
     [SerializeField] private float thrustIncreaseRate = 10.0f;
     [SerializeField] private float thrustDecreaseRate = 20.0f;
     public float terminalVelocity = 12.0f;
+    [SerializeField] private float tempTerminalVelocity;
+    [SerializeField] private float terminalVelocityDecay;
 
     private float currentTerminalVelocity;
 
@@ -66,8 +68,8 @@ public class SimpleInertial : MonoBehaviour
             rb.velocity = rb.velocity.normalized * currentTerminalVelocity;
         }
 
-        currentTerminalVelocity -= Time.fixedDeltaTime;
-        currentTerminalVelocity = Mathf.Clamp(currentTerminalVelocity, terminalVelocity, 2f * terminalVelocity);
+        currentTerminalVelocity -= Time.fixedDeltaTime * terminalVelocityDecay;
+        currentTerminalVelocity = Mathf.Clamp(currentTerminalVelocity, terminalVelocity, tempTerminalVelocity);
     }
 
 

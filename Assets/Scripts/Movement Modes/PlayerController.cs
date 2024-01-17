@@ -40,6 +40,11 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         RotatePlayer();
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            Boost(playerRb);
+        }
     }
 
 
@@ -52,10 +57,6 @@ public class PlayerController : MonoBehaviour
             Brake(playerRb);
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            Boost(playerRb);
-        }
     }
 
     private void Boost(Rigidbody2D rb)

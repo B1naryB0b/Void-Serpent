@@ -35,15 +35,20 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+        RotatePlayer();
     }
 
     private void Update()
     {
-        RotatePlayer();
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             Boost(playerRb);
+        }
+
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            Brake(playerRb);
         }
     }
 
@@ -51,12 +56,6 @@ public class PlayerController : MonoBehaviour
     private void MovePlayer()
     {
         inertialMovement.UpdateMovement(playerRb, currentThrust);
-
-        if (Input.GetKey(KeyCode.LeftControl))
-        {
-            Brake(playerRb);
-        }
-
     }
 
     private void Boost(Rigidbody2D rb)
@@ -82,7 +81,6 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, rotationTowardsMouse, Time.deltaTime * playerData.pointToMouseRotationSpeed);
 
         Vector3 tiltRotation = GetTiltBasedOnAngleToMouse();
-        //Debug.Log(tiltRotation);
         Vector3 currentMeshRotationEuler = playerMeshObject.transform.localEulerAngles;
         float lerpedYTilt = CustomLerpAngle(currentMeshRotationEuler.y, tiltRotation.y, Time.deltaTime * playerData.tiltRotationSpeed);
 

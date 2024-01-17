@@ -60,7 +60,9 @@ public class PlayerController : MonoBehaviour
 
     private void Boost(Rigidbody2D rb)
     {
-        rb.velocity = transform.up * inertialMovement.terminalVelocity;
+        Vector2 boostVector = transform.up * inertialMovement.terminalVelocity;
+        inertialMovement.SetBoostTerminalVelocity(boostVector.magnitude);
+        rb.velocity += boostVector;
     }
 
     private void Brake(Rigidbody2D rb)

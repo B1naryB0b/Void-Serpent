@@ -184,8 +184,6 @@ public class ParallaxBackgroundGenerator : ScriptableObject
         );
     }
 
-
-
     private void ObjectSpacing(Vector3 clusterCenter, GameObject parentObject)
     {
         int objectsInCluster = UnityEngine.Random.Range(3, 10);
@@ -205,6 +203,5 @@ public class ParallaxBackgroundGenerator : ScriptableObject
             }
         }
     }
-
 
 }

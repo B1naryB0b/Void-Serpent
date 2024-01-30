@@ -19,6 +19,11 @@ public class Weapon : ScriptableObject
     {
         if (bulletPrefab)
         {
+            SpawnBulletsByRampingTier(rampingTier, playerTransform);
+        }
+
+        void SpawnBulletsByRampingTier(int rampingTier, Transform playerTransform)
+        {
             AudioController.Instance.PlaySound(shootSound, 0.5f);
 
             switch (rampingTier)

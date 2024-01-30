@@ -3,30 +3,26 @@ using UnityEngine;
 
 public class BulletController : MonoBehaviour
 {
-    public float speed = 10.0f;       // Speed of the bullet
-    public int damage = 1;            // Damage dealt by the bullet
-    public float lifeTime = 5.0f;     // Time after which the bullet will be destroyed
+    public float speed = 10.0f;
+    public int damage = 1;
+    public float lifeTime = 5.0f;
     [Range(0f, 1f)]
     public float lifeTimeMultiplier;
     private float activeTime;
 
-    public AudioClip hitEnemySound;     // Sound effect when bullet hits an enemy
-    public AudioClip hitPlayerSound;    // Sound effect when bullet hits the player
+    public AudioClip hitEnemySound;
+    public AudioClip hitPlayerSound;
 
     public AnimationCurve speedCurve;
 
     private void Start()
     {
-        // Destroy the bullet after a certain time to prevent memory leaks
         Destroy(gameObject, lifeTime);
         activeTime = Time.time;
     }
 
-
-    // Update is called once per frame
     private void Update()
     {
-        // Move the bullet in its forward direction
         transform.Translate(Vector3.up * speed * Time.deltaTime * speedCurve.Evaluate((Time.time - activeTime)/(lifeTime * lifeTimeMultiplier)));
     }
 
@@ -37,32 +33,37 @@ public class BulletController : MonoBehaviour
             Destroy(gameObject);
         }
 
-        // If this bullet is a player's bullet, it should only damage enemies
         if (gameObject.layer == LayerMask.NameToLayer("PlayerBullet"))
         {
-            EnemyController enemy = other.gameObject.GetComponent<EnemyController>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(damage);
-                AudioController.Instance.PlaySound(hitEnemySound);
-                Destroy(gameObject);
-            }
+            DamageEnemy(other);
         }
-        // If this bullet is an enemy's bullet, it should only damage the player
         else if (gameObject.layer == LayerMask.NameToLayer("EnemyBullet"))
         {
-            PlayerHP player = other.gameObject.GetComponent<PlayerHP>();
-            if (player != null)
-            {
-                player.TakeDamage(damage);
-                AudioController.Instance.PlaySound(hitPlayerSound);
-                Destroy(gameObject);
-            }
+            DamagePlayer(other);
         }
 
     }
 
-    
+    private void DamageEnemy(Collider2D other)
+    {
+        EnemyController enemy = other.gameObject.GetComponent<EnemyController>();
+        if (enemy != null)
+        {
+            enemy.TakeDamage(damage);
+            AudioController.Instance.PlaySound(hitEnemySound);
+            Destroy(gameObject);
+        }
+    }
 
+    private void DamagePlayer(Collider2D other)
+    {
+        PlayerHP player = other.gameObject.GetComponent<PlayerHP>();
+        if (player != null)
+        {
+            player.TakeDamage(damage);
+            AudioController.Instance.PlaySound(hitPlayerSound);
+            Destroy(gameObject);
+        }
+    }
 
 }

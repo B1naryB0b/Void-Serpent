@@ -20,13 +20,11 @@ public class LineFollowTarget : MonoBehaviour
 
     private LineRenderer lineRenderer;
 
-    // Start is called before the first frame update
     void Start()
     {
         lineRenderer = GetComponent<LineRenderer>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         float angleFromAnchorToTarget = CalculateSignedAngle(anchor, target);
@@ -56,7 +54,6 @@ public class LineFollowTarget : MonoBehaviour
 
         lineRenderer.startColor = currentColor; 
         lineRenderer.endColor = currentColor;
-
 
     }
 

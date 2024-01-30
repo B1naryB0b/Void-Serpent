@@ -29,12 +29,17 @@ public class Shooter : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Mouse0) && Time.time > nextShootTime)
         {
+            Shoot();
+        }
+
+        void Shoot()
+        {
             Weapon weapon = weaponManager.equippedWeapon;
             float shotShake = (1f / weapon.playerShootRate) * Mathf.Pow(1.05f, rampingController.CurrentRampingTier);
 
-            if(ScreenShaker.Instance.GetCurrentTrauma() < 0.2f)
+            if (ScreenShaker.Instance.GetCurrentTrauma() < 0.2f)
             {
-                ScreenShaker.Instance.Shake(shotShake);  
+                ScreenShaker.Instance.Shake(shotShake);
             }
 
             rb.AddForce(-transform.up * weapon.recoil);
@@ -49,12 +54,15 @@ public class Shooter : MonoBehaviour
 
         for (int i = 0; i < numberOfWeapons; i++)
         {
-            if (Input.GetKeyDown((KeyCode)Enum.Parse(typeof(KeyCode), "Alpha" + (i + 1))))
-            {
-                weaponManager.EquipWeapon(i + 1);
-            }
+            ParseWeaponEnum(i);
         }
     }
 
-
+    private void ParseWeaponEnum(int i)
+    {
+        if (Input.GetKeyDown((KeyCode)Enum.Parse(typeof(KeyCode), "Alpha" + (i + 1))))
+        {
+            weaponManager.EquipWeapon(i + 1);
+        }
+    }
 }

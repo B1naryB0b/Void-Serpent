@@ -27,9 +27,6 @@ public struct TransformComponent
     }
 }
 
-
-
-
 [System.Serializable]
 public abstract class AnimationElement
 {
@@ -38,7 +35,6 @@ public abstract class AnimationElement
     public float animationDuration;
     public AnimationCurve curve;
 }
-
 
 [System.Serializable]
 public class ColorAnimationElement : AnimationElement

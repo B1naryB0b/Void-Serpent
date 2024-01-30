@@ -40,7 +40,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        GetPlayerInput();
+    }
 
+    private void GetPlayerInput()
+    {
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             Boost(playerRb);
@@ -51,7 +55,6 @@ public class PlayerController : MonoBehaviour
             Brake(playerRb);
         }
     }
-
 
     private void MovePlayer()
     {
@@ -111,7 +114,6 @@ public class PlayerController : MonoBehaviour
         Vector3 mousePosition = GetMousePositionOnPlayerPlane();
         float signedAngle = CalculateSignedAngleToMouse(mousePosition);
         float yTilt = Mathf.Clamp(signedAngle, -playerData.tiltClampAngle, playerData.tiltClampAngle);
-        //Debug.Log(signedAngle);
 
         return new Vector3(0, yTilt, 0);
     }
@@ -133,7 +135,6 @@ public class PlayerController : MonoBehaviour
 
     float CustomLerpAngle(float startAngle, float endAngle, float t)
     {
-        // Normalize angles to be in the range -180 to 180
         startAngle = NormalizeAngle(startAngle);
         endAngle = NormalizeAngle(endAngle);
 

@@ -14,7 +14,7 @@ public class WeaponManager : MonoBehaviour
         EquipWeapon(1);
     }
 
-    public void EquipWeapon(int weaponIndex = 1)
+    public void EquipWeapon(int weaponIndex = 1) 
     {
         if (weaponIndex > weapons.Count) { Debug.LogError("Weapon Index Out of Range (Check weapon list)"); }
     
@@ -26,5 +26,4 @@ public class WeaponManager : MonoBehaviour
         return weapons.Count;
     }
     
-
 }

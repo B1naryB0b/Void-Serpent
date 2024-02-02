@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81c3cfea046ec744d90951b26f70b4a8, type: 3}
-  m_Name: Dynamic Background Generator Manager
+  m_Name: SO_DynamicBackgroundGeneratorManager
   m_EditorClassIdentifier: 
   mapSize: {x: 500, y: 300}
   noiseScale: 0.1

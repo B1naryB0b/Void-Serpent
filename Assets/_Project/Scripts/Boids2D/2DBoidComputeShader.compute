@@ -1,0 +1,67 @@
+#pragma kernel CSMain
+
+// Define constants
+static const int threadGroupSize = 1024;
+
+// Simplify the Boid structure for 2D space by removing the y component.
+struct Boid
+{
+    float2 position; // 2D position
+    float2 direction; // 2D direction
+
+    // Flocking vectors
+    float2 flockHeading;
+    float2 flockCentre;
+    float2 separationHeading;
+
+    // Count of nearby boids
+    int numFlockmates;
+};
+
+// Buffer for boids
+RWStructuredBuffer<Boid> boids;
+
+// Variables
+int numBoids;
+float viewRadius;
+float avoidRadius;
+
+[numthreads(threadGroupSize, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    // Zero-initialize the flocking vectors and count at the start of the computation.
+    boids[id.x].flockHeading = float2(0, 0);
+    boids[id.x].flockCentre = float2(0, 0);
+    boids[id.x].separationHeading = float2(0, 0);
+    boids[id.x].numFlockmates = 0;
+
+    for (int indexB = 0; indexB < numBoids; indexB++)
+    {
+        if (id.x != indexB)
+        {
+            Boid boidB = boids[indexB];
+            
+            // Calculate the offset in 2D
+            float2 offset = boidB.position - boids[id.x].position;
+            float sqrDst = offset.x * offset.x + offset.y * offset.y; // Here, we use the 2D distance formula
+
+            // If the other boid is within the view radius
+            if (sqrDst < viewRadius * viewRadius)
+            {
+                boids[id.x].numFlockmates += 1;
+                boids[id.x].flockHeading += boidB.direction;
+                boids[id.x].flockCentre += boidB.position;
+
+                // If the other boid is within the avoidance radius
+                if (sqrDst < avoidRadius * avoidRadius)
+                {
+                    // The division is a way to normalize the separation vector while taking distance into account.
+                    boids[id.x].separationHeading -= offset / sqrDst;
+                }
+            }
+        }
+    }
+    
+    // At this point, you can calculate averages or make other calculations based on numFlockmates, etc., if needed.
+    // For instance, if the boid had flockmates, you might want to calculate the average direction or centre point of the flock.
+}

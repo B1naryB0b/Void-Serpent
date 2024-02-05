@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c61b70edb72cbe4f8a06c3b66acaf23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lives: 2
+  lives: 6
   _fireRate: 0.5
   _fireRateVariance: 0.1
   _fireRange: 200

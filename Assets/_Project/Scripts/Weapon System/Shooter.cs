@@ -35,7 +35,7 @@ public class Shooter : MonoBehaviour
         void Shoot()
         {
             Weapon weapon = weaponManager.equippedWeapon;
-            float shotShake = (1f / weapon.playerShootRate) * Mathf.Pow(1.05f, rampingController.CurrentRampingTier);
+            float shotShake = (1f / (weapon.playerShootRate * 2f)) * Mathf.Pow(1.05f, rampingController.CurrentRampingTier);
 
             if (ScreenShaker.Instance.GetCurrentTrauma() < 0.2f)
             {

@@ -15,15 +15,35 @@ public class BulletController : MonoBehaviour
 
     public AnimationCurve speedCurve;
 
+    private SpriteRenderer spriteRenderer;
+
     private void Start()
     {
         Destroy(gameObject, lifeTime);
         activeTime = Time.time;
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
     {
+        float timeSinceActive = Time.time - activeTime;
+
         transform.Translate(Vector3.up * speed * Time.deltaTime * speedCurve.Evaluate((Time.time - activeTime)/(lifeTime * lifeTimeMultiplier)));
+
+        if (timeSinceActive >= lifeTime * 0.8f)
+        {
+            float elapsedFadeTime = timeSinceActive - lifeTime * 0.8f;
+            float fadeDuration = lifeTime * 0.2f;
+            float alpha = 1.0f - (elapsedFadeTime / fadeDuration);
+            SetAlpha(alpha);
+        }
+    }
+
+    private void SetAlpha(float alpha)
+    {
+        Color color = spriteRenderer.color;
+        color.a = Mathf.Clamp01(alpha);
+        spriteRenderer.color = color;
     }
 
     void OnTriggerEnter2D(Collider2D other)

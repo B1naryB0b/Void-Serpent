@@ -1,5 +1,7 @@
 # Void Serpent
 
+**Development on this project is currently paused**
+
 You can find complete builds of the game on my [itch.io](https://b1nary-b0b.itch.io/void-serpent).
 
 *Please note this game is incomplete and in the very early stages. It will likely still have game breaking bugs.
